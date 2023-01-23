@@ -7,7 +7,7 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class Template : MonoBehaviour {
+public class RGBSet : MonoBehaviour {
 
    public KMBombInfo Bomb;
    public KMAudio Audio;
