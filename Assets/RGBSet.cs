@@ -17,14 +17,21 @@ public class RGBSet : MonoBehaviour
     int ModuleId;
     private bool ModuleSolved;
 
-    public KMSelectable[] Buttons;
+    public KMSelectable[] ColouredButtons;
+    public KMSelectable[] StageLights;
     public TextMesh ScreenText;
 
-    void Awake () {
+    void Awake() {
         ModuleId = ModuleIdCounter++;
 
-        foreach (KMSelectable button in Buttons) {
-            button.OnInteract += delegate () { ButtonPress(button); return false; };
+        foreach (KMSelectable button in ColouredButtons)
+        {
+            button.OnInteract += delegate() { ButtonPress(button); return false; };
+        }
+
+        foreach (KMSelectable light in StageLights)
+        {
+            light.OnInteract += delegate () { StageLightPress(light); return false; };
         }
     }
 
@@ -32,6 +39,11 @@ public class RGBSet : MonoBehaviour
     {
         ScreenText.text = button.name;
         button.GetComponent<MeshRenderer>().material.color = GetRandomTernaryColour();
+    }
+
+    void StageLightPress(KMSelectable light)
+    {
+        ScreenText.text = light.name;
     }
 
     Color GetRandomTernaryColour()

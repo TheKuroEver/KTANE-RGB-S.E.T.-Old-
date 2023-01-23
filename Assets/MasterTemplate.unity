@@ -822,7 +822,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bomb: {fileID: 553505901}
   Audio: {fileID: 553505902}
-  Buttons:
+  ColouredButtons:
   - {fileID: 1653016920}
   - {fileID: 1024999301}
   - {fileID: 498043253}
@@ -832,6 +832,10 @@ MonoBehaviour:
   - {fileID: 1937559748}
   - {fileID: 102170904}
   - {fileID: 1815972918}
+  StageLights:
+  - {fileID: 2053386635}
+  - {fileID: 1045801058}
+  - {fileID: 827181860}
   ScreenText: {fileID: 1296720985}
 --- !u!114 &553505899
 MonoBehaviour:
@@ -950,9 +954,9 @@ Transform:
   m_Children:
   - {fileID: 917131980}
   - {fileID: 1793874516}
-  - {fileID: 827181856}
-  - {fileID: 1045801054}
   - {fileID: 2053386636}
+  - {fileID: 1045801054}
+  - {fileID: 827181856}
   m_Father: {fileID: 896532386}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1141,7 +1145,7 @@ Transform:
   m_Children:
   - {fileID: 882303751}
   m_Father: {fileID: 623776516}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &827181857
 MeshRenderer:
@@ -3467,7 +3471,7 @@ Transform:
   m_Children:
   - {fileID: 1591758687}
   m_Father: {fileID: 623776516}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2053386637
 MeshRenderer:
