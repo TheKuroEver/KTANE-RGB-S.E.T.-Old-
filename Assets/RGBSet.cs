@@ -7,44 +7,63 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class RGBSet : MonoBehaviour {
+public class RGBSet : MonoBehaviour
+{
 
-   public KMBombInfo Bomb;
-   public KMAudio Audio;
+    public KMBombInfo Bomb;
+    public KMAudio Audio;
 
-   static int ModuleIdCounter = 1;
-   int ModuleId;
-   private bool ModuleSolved;
+    static int ModuleIdCounter = 1;
+    int ModuleId;
+    private bool ModuleSolved;
 
-   void Awake () {
-      ModuleId = ModuleIdCounter++;
-      /*
-      foreach (KMSelectable object in keypad) {
-          object.OnInteract += delegate () { keypadPress(object); return false; };
-      }
-      */
+    public KMSelectable[] Buttons;
+    public TextMesh ScreenText;
 
-      //button.OnInteract += delegate () { buttonPress(); return false; };
+    void Awake () {
+        ModuleId = ModuleIdCounter++;
 
-   }
+        foreach (KMSelectable button in Buttons) {
+            button.OnInteract += delegate () { ButtonPress(button); return false; };
+        }
+    }
 
-   void Start () {
+    void ButtonPress(KMSelectable button)
+    {
+        ScreenText.text = button.name;
+        button.GetComponent<MeshRenderer>().material.color = GetRandomTernaryColour();
+    }
 
-   }
+    Color GetRandomTernaryColour()
+    {
+        float redComponent = 0.5f * Rnd.Range(0, 3);
+        float greenComponent = 0.5f * Rnd.Range(0, 3);
+        float blueComponent = 0.5f * Rnd.Range(0, 3);
 
-   void Update () {
+        return new Color(redComponent, greenComponent, blueComponent);
+    }
 
-   }
+    void Start()
+    {
 
-#pragma warning disable 414
-   private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
-#pragma warning restore 414
+    }
 
-   IEnumerator ProcessTwitchCommand (string Command) {
-      yield return null;
-   }
+    void Update()
+    {
 
-   IEnumerator TwitchHandleForcedSolve () {
-      yield return null;
-   }
+    }
+
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
+    #pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string Command)
+    {
+        yield return null;
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        yield return null;
+    }
 }
