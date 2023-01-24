@@ -59,7 +59,7 @@ public class RGBSet : MonoBehaviour
 
     void Start()
     {
-
+        
     }
 
     void Update()
