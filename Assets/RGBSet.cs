@@ -37,8 +37,10 @@ public class RGBSet : MonoBehaviour
 
     void ButtonPress(KMSelectable button)
     {
+        float scale = Rnd.Range(0, 3)*0.25f + 0.5f;
         ScreenText.text = button.name;
         button.GetComponent<MeshRenderer>().material.color = GetRandomTernaryColour();
+        button.GetComponent<Transform>().localScale = new Vector3(0.03173903f * scale, 0.03173903f * scale, 0.03173903f * scale);
     }
 
     void StageLightPress(KMSelectable light)
