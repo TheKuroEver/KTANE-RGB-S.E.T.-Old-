@@ -21,28 +21,42 @@ public class RGBSet : MonoBehaviour
     public KMSelectable[] StageLights;
     public TextMesh ScreenText;
 
+    private ColouredCube[] _colouredCubes = new ColouredCube[9];
+
     private const float bigCubeSize = 0.03173903f;
 
     void Awake() {
         ModuleId = ModuleIdCounter++;
 
-        foreach (KMSelectable button in ColouredButtons)
+        for (int i = 0; i < 9; i++)
         {
-            button.OnInteract += delegate() { ButtonPress(button); return false; };
+            _colouredCubes[i] = new ColouredCube(ColouredButtons[i]);
+        }
+
+        foreach (ColouredCube cube in _colouredCubes)
+        {
+            cube.Cube.OnInteract += delegate() { ButtonPress(cube); return false; };
+            cube.Cube.OnHighlight += delegate() { ScreenText.text = cube.ColourName;};
+            cube.Cube.OnHighlightEnded += delegate () { ScreenText.text = ""; };
         }
 
         foreach (KMSelectable light in StageLights)
         {
             light.OnInteract += delegate () { StageLightPress(light); return false; };
+            light.OnHighlight += delegate () { ScreenText.text = light.name; };
+            light.OnHighlightEnded += delegate () { ScreenText.text = ""; };
         }
     }
 
-    void ButtonPress(KMSelectable button)
+    void ButtonPress(ColouredCube cube)
     {
+        int newRedValue = Rnd.Range(0, 3);
+        int newGreenValue = Rnd.Range(0, 3);
+        int newBlueValue = Rnd.Range(0, 3);
+
         float newScale = Rnd.Range(0, 3)*0.25f + 0.5f;
-        ScreenText.text = button.name;
-        StartCoroutine(SmoothCubeScale(button, newScale));
-        StartCoroutine(SmoothCubeColourTransition(button, GetRandomTernaryColour()));
+        StartCoroutine(SmoothCubeScale(cube.Cube, newScale));
+        StartCoroutine(cube.SetColourWithRGBValues(newRedValue, newGreenValue, newBlueValue));
     }
 
     IEnumerator SmoothCubeScale(KMSelectable cube, float newScale)
@@ -61,38 +75,9 @@ public class RGBSet : MonoBehaviour
         }
     }
 
-    IEnumerator SmoothCubeColourTransition(KMSelectable cube, Color newColour)
-    {
-        Color currentColor = cube.GetComponent<MeshRenderer>().material.color;
-        float delta = 0;
-        float transitionSeconds = 1;
-        float redDifference = newColour.r - currentColor.r;
-        float greenDifference = newColour.g - currentColor.g;
-        float blueDifference = newColour.b - currentColor.b;
-        float colourDeltaMultiplier;
-
-        while (delta < transitionSeconds)
-        {
-            delta += Time.deltaTime;
-            colourDeltaMultiplier = (Time.deltaTime / transitionSeconds);
-            cube.GetComponent<MeshRenderer>().material.color = new Color(currentColor.r + colourDeltaMultiplier * redDifference, currentColor.g + colourDeltaMultiplier * greenDifference, currentColor.b + colourDeltaMultiplier * blueDifference);
-            currentColor = cube.GetComponent<MeshRenderer>().material.color;
-            yield return null;
-        }
-    }
-
     void StageLightPress(KMSelectable light)
     {
-        ScreenText.text = light.name;
-    }
-
-    Color GetRandomTernaryColour()
-    {
-        float redComponent = 0.5f * Rnd.Range(0, 3);
-        float greenComponent = 0.5f * Rnd.Range(0, 3);
-        float blueComponent = 0.5f * Rnd.Range(0, 3);
-
-        return new Color(redComponent, greenComponent, blueComponent);
+        ScreenText.text = "HELLO!";
     }
 
     void Start()
