@@ -19,11 +19,10 @@ public class RGBSet : MonoBehaviour
 
     public KMSelectable[] ColouredButtons;
     public KMSelectable[] StageLights;
+    public KMSelectable ScreenButton;
     public TextMesh ScreenText;
 
     private ColouredCube[] _colouredCubes = new ColouredCube[9];
-
-    private const float bigCubeSize = 0.03173903f;
 
     void Awake() {
         ModuleId = ModuleIdCounter++;
@@ -42,42 +41,35 @@ public class RGBSet : MonoBehaviour
 
         foreach (KMSelectable light in StageLights)
         {
-            light.OnInteract += delegate () { StageLightPress(light); return false; };
-            light.OnHighlight += delegate () { ScreenText.text = light.name; };
-            light.OnHighlightEnded += delegate () { ScreenText.text = ""; };
+            light.OnInteract += delegate() { StageLightPress(light); return false; };
+            light.OnHighlight += delegate() { ScreenText.text = light.name; };
+            light.OnHighlightEnded += delegate() { ScreenText.text = ""; };
         }
+
+        ScreenButton.OnInteract += delegate () { ScreenButtonPress(); return false; };
     }
 
-    void ButtonPress(ColouredCube cube)
+    void ButtonPress(ColouredCube cube) // Temporary
     {
         int newRedValue = Rnd.Range(0, 3);
         int newGreenValue = Rnd.Range(0, 3);
         int newBlueValue = Rnd.Range(0, 3);
 
-        float newScale = Rnd.Range(0, 3)*0.25f + 0.5f;
-        StartCoroutine(SmoothCubeScale(cube.Cube, newScale));
+        float newScale = Rnd.Range(0, 3);
+        StartCoroutine(cube.SetSize(newScale));
         StartCoroutine(cube.SetColourWithRGBValues(newRedValue, newGreenValue, newBlueValue));
-    }
 
-    IEnumerator SmoothCubeScale(KMSelectable cube, float newScale)
-    {
-        float delta = 0;
-        float scaleSeconds = 1;
-        float scaleDifference = bigCubeSize * newScale - cube.transform.localScale.x;
-        float sizeDelta;
-
-        while (delta < scaleSeconds)
-        {
-            delta += Time.deltaTime;
-            sizeDelta = (Time.deltaTime / scaleSeconds) * scaleDifference;
-            cube.transform.localScale += new Vector3(sizeDelta, sizeDelta, sizeDelta);
-            yield return null;
-        }
+        ScreenText.text = cube.ColourName;
     }
 
     void StageLightPress(KMSelectable light)
     {
         ScreenText.text = "HELLO!";
+    }
+
+    void ScreenButtonPress()
+    {
+        ScreenText.text = "AYO?? :O";
     }
 
     void Start()

@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine;  
 using Rnd = UnityEngine.Random;
 
 public class ColouredCube
 {
     private KMSelectable _cube;
     private Color _cubeColour;
+    private const float bigCubeSize = 0.03173903f;
 
     public KMSelectable Cube { get { return _cube; } }
     public string ColourName { get { return getColourName[_cubeColour]; } }
 
+    // I know the way this is done is kinda stupid but I was just experimenting so let me have it.
     private Dictionary<Color, string> getColourName = new Dictionary<Color, string>()
     {
         { new Color(0, 0, 0), "Black"},
@@ -78,5 +80,23 @@ public class ColouredCube
             yield return null;
         }
         _cube.GetComponent<MeshRenderer>().material.color = _cubeColour;
+    }
+
+    public IEnumerator SetSize(float newSize)
+    {
+        float previousSize = _cube.transform.localScale.x;
+        float delta = 0;
+        float scaleSeconds = 1;
+        float currentTransitionSize;
+
+        newSize = bigCubeSize * (newSize * 0.25f + 0.5f);
+
+        while (delta < scaleSeconds)
+        {
+            delta += Time.deltaTime;
+            currentTransitionSize = Mathf.Min(1, delta / scaleSeconds) * (newSize - previousSize) + previousSize;
+            _cube.transform.localScale = new Vector3(currentTransitionSize, currentTransitionSize, currentTransitionSize);
+            yield return null;
+        }
     }
 }
