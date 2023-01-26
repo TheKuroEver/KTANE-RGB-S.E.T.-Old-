@@ -41,8 +41,9 @@ GameObject:
   - component: {fileID: 65102790354180178}
   - component: {fileID: 23172959198182372}
   - component: {fileID: 114929133786914552}
+  - component: {fileID: 114612683447988698}
   m_Layer: 0
-  m_Name: Button
+  m_Name: Coloured Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -56,7 +57,7 @@ Transform:
   m_GameObject: {fileID: 1590407719062176}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.04, y: 0, z: 0.04}
-  m_LocalScale: {x: 0.031738993, y: 0.031739034, z: 0.031739034}
+  m_LocalScale: {x: 0.03173903, y: 0.031739034, z: 0.031739034}
   m_Children:
   - {fileID: 4990614432592680}
   m_Father: {fileID: 0}
@@ -89,7 +90,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 65899cd7d823f409b8d87505527ab56f, type: 2}
+  - {fileID: 2100000, guid: b1e9d040dcbad794bbf4dc1b32ef2895, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -160,6 +161,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightScale: {x: 1, y: 1, z: 1}
   OutlineAmount: 0
+--- !u!114 &114612683447988698
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1590407719062176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8819a033adb05743bca52bf72a3d129, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114929133786914552
 MonoBehaviour:
   m_ObjectHideFlags: 1

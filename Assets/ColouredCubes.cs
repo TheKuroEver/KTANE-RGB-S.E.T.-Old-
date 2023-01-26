@@ -17,10 +17,22 @@ public class ColouredCubes : MonoBehaviour
     private int ModuleId;
     private bool ModuleSolved;
 
+    public CubeScript[] Cubes;
+    public TextMesh ScreenText;
 
     void Awake()
     {
+        KMSelectable tempSelectable;
+
         ModuleId = ModuleIdCounter++;
+
+        foreach (CubeScript cube in Cubes)
+        {
+            tempSelectable = cube.GetComponentInParent<KMSelectable>();
+            tempSelectable.OnInteract += delegate () { ButtonPress(cube); return false; };
+            tempSelectable.OnHighlight += delegate () { ScreenText.text = cube.ColourAsName; };
+            tempSelectable.OnHighlightEnded += delegate () { ScreenText.text = ""; };
+        }
     }
 
     void Start()
@@ -31,6 +43,13 @@ public class ColouredCubes : MonoBehaviour
     void Update()
     {
 
+    }
+
+    void ButtonPress(CubeScript cube)
+    {
+        cube.ChangeSize(Rnd.Range(0, 3));
+        cube.ChangeColour(Rnd.Range(0, 3), Rnd.Range(0, 3), Rnd.Range(0, 3));
+        ScreenText.text = cube.ColourAsName;
     }
 
     #pragma warning disable 414
