@@ -20,8 +20,11 @@ public class ColouredCubes : MonoBehaviour
     public CubeScript[] Cubes;
     public TextMesh ScreenText;
 
+    private ScreenTextHandler _screen;
+
     void Awake()
     {
+        _screen = new ScreenTextHandler(ScreenText);
         KMSelectable tempSelectable;
 
         ModuleId = ModuleIdCounter++;
@@ -30,8 +33,8 @@ public class ColouredCubes : MonoBehaviour
         {
             tempSelectable = cube.GetComponentInParent<KMSelectable>();
             tempSelectable.OnInteract += delegate () { ButtonPress(cube); return false; };
-            tempSelectable.OnHighlight += delegate () { ScreenText.text = cube.ColourAsName; };
-            tempSelectable.OnHighlightEnded += delegate () { ScreenText.text = ""; };
+            tempSelectable.OnHighlight += delegate () { cube.EnableHighlightOverride(true);  _screen.SetText(cube.ColourAsName); };
+            tempSelectable.OnHighlightEnded += delegate () { cube.EnableHighlightOverride(false); _screen.SetText(""); };
         }
     }
 
@@ -45,11 +48,11 @@ public class ColouredCubes : MonoBehaviour
 
     }
 
-    void ButtonPress(CubeScript cube)
+    void ButtonPress(CubeScript cube) // Need to add a sound effect on selections.
     {
         cube.ChangeSize(Rnd.Range(0, 3));
         cube.ChangeColour(Rnd.Range(0, 3), Rnd.Range(0, 3), Rnd.Range(0, 3));
-        ScreenText.text = cube.ColourAsName;
+        _screen.SetText(cube.ColourAsName);
     }
 
     #pragma warning disable 414
@@ -64,5 +67,35 @@ public class ColouredCubes : MonoBehaviour
     IEnumerator TwitchHandleForcedSolve()
     {
         yield return null;
+    }
+
+    private class ScreenTextHandler
+    {
+        private TextMesh _screenText;
+        private string _textValue;
+        private bool _isOverride = false;
+
+        public ScreenTextHandler(TextMesh screenText)
+        {
+            _screenText = screenText;
+        }
+
+        public void SetText(string value)
+        {
+            _textValue = value;
+            if (!_isOverride) _screenText.text = _textValue;
+        }
+
+        public void EnableOverride(string overrideText)
+        {
+            _screenText.text = overrideText;
+            _isOverride = true;
+        }
+
+        public void DisableOverride()
+        {
+            _screenText.text = _textValue;
+            _isOverride = false;
+        }
     }
 }

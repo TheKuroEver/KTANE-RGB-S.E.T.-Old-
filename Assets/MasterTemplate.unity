@@ -2611,15 +2611,15 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1590407719062176, guid: 50a267658e8b7504eb7edd15f2817ef7, type: 2}
+      propertyPath: m_Name
+      value: A1
+      objectReference: {fileID: 0}
     - target: {fileID: 114929133786914552, guid: 50a267658e8b7504eb7edd15f2817ef7,
         type: 2}
       propertyPath: Parent
       value: 
       objectReference: {fileID: 553505899}
-    - target: {fileID: 1590407719062176, guid: 50a267658e8b7504eb7edd15f2817ef7, type: 2}
-      propertyPath: m_Name
-      value: A1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 50a267658e8b7504eb7edd15f2817ef7, type: 2}
   m_IsPrefabParent: 0

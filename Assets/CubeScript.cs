@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class CubeScript : MonoBehaviour {
 
+	[SerializeField]
+	private GameObject SelectionHighlight;
+
 	private const float _biggestCubeSize = 0.03173903f;
 
 	private MeshRenderer _cubeMeshRenderer;
@@ -15,6 +18,8 @@ public class CubeScript : MonoBehaviour {
 
 	private bool _isChangingSize = false;
 	private bool _isChangingColour = false;
+	private bool _isSelected = false;
+	private bool _isHidden = false;
 
 	private string _colourAsName;
 
@@ -27,9 +32,9 @@ public class CubeScript : MonoBehaviour {
 			string colourValuesAsString = "";
 
 			foreach (int value in _colourAsTernaryValues)
-            {
+			{
 				colourValuesAsString += value.ToString();
-            }
+			}
 
 			_colourAsName = TernaryToColourName[colourValuesAsString];
 			return _colourAsName;
@@ -37,8 +42,8 @@ public class CubeScript : MonoBehaviour {
 	}
 	public bool IsChangingColour { get { return _isChangingColour; } }
 
-    private readonly Dictionary<string, string> TernaryToColourName = new Dictionary<string, string>()
-    {
+	private readonly Dictionary<string, string> TernaryToColourName = new Dictionary<string, string>()
+	{
 		{"000", "Black" },
 		{"001", "Indigo" },
 		{"002", "Blue" },
@@ -67,8 +72,8 @@ public class CubeScript : MonoBehaviour {
 		{"221", "Cream" },
 		{"222", "White" }
 	};
-    
-	void Start () {
+
+	void Start() {
 		_cubeMeshRenderer = GetComponentInParent<MeshRenderer>();
 		_cubeTransform = GetComponentInParent<Transform>();
 		_position = GetPositionFromName();
@@ -86,27 +91,35 @@ public class CubeScript : MonoBehaviour {
 	}
 
 	public void ChangeSize(int newSize)
-    {
+	{
 		if (_isChangingSize) return;
 
 		if (newSize == _size) return;
 
 		_isChangingSize = true;
 		StartCoroutine(SetSizeTo(newSize));
-    }
+	}
 
 	public void ChangeColour(int newRedValue, int newGreenValue, int newBlueValue)
-    {
+	{
 		if (_isChangingColour) return;
 
 		if ((newRedValue == _colourAsTernaryValues[0]) && (newGreenValue == _colourAsTernaryValues[1]) && (newBlueValue == _colourAsTernaryValues[2])) return;
 
 		_isChangingColour = true;
 		StartCoroutine(SetColourTo(newRedValue, newGreenValue, newBlueValue));
+	}
+
+	public void SetHiddenStatus(bool value)
+    {
+		if (value == _isHidden) return;
+
+		_isHidden = value;
+		StartCoroutine(MoveToHidden(value));
     }
 
 	private IEnumerator SetSizeTo(int newSize)
-    {
+	{
 		float transitionTime = 1;
 		float elapsedTime = 0;
 		float transitionProgress;
@@ -117,7 +130,7 @@ public class CubeScript : MonoBehaviour {
 		yield return null;
 
 		while (elapsedTime <= transitionTime)
-        {
+		{
 			elapsedTime += Time.deltaTime;
 			transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
 			currentTransitionScale = (transitionProgress * sizeDifference + _size) * 0.25f + 0.5f;
@@ -125,14 +138,14 @@ public class CubeScript : MonoBehaviour {
 
 			_cubeTransform.localScale = new Vector3(currentTransitionSize, currentTransitionSize, currentTransitionSize);
 			yield return null;
-        }
+		}
 
 		_size = newSize;
 		_isChangingSize = false;
-    }
+	}
 
 	private IEnumerator SetColourTo(int newRedValue, int newGreenValue, int newBlueValue)
-    {
+	{
 		int[] oldColourValues = _colourAsTernaryValues;
 		float transitionTime = 1;
 		float elapsedTime = 0;
@@ -150,7 +163,7 @@ public class CubeScript : MonoBehaviour {
 		yield return null;
 
 		while (elapsedTime <= transitionTime)
-        {
+		{
 			elapsedTime += Time.deltaTime;
 			transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
 			currentRedValue = 0.5f * (transitionProgress * redDifference + oldColourValues[0]);
@@ -163,4 +176,37 @@ public class CubeScript : MonoBehaviour {
 
 		_isChangingColour = false;
 	}
+
+	private IEnumerator	MoveToHidden(bool value)
+    {
+		Vector3 startPosition = _cubeTransform.localPosition;
+		float transitionTime = 1;
+		float elapsedTime = 0;
+		float transitionProgress;
+		float newY = value ? -0.04f : 0;
+		float yDifference = newY - startPosition.y;
+		float currentTransitionY;
+
+		yield return null;
+
+		while (elapsedTime <= transitionTime)
+		{
+			elapsedTime += Time.deltaTime;
+			transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
+			currentTransitionY = startPosition.y + transitionProgress * yDifference;
+			_cubeTransform.localPosition = new Vector3(startPosition.x, currentTransitionY, startPosition.z);
+			yield return null;
+		}
+	}
+
+	public void EnableSelectionHighlight(bool value)
+    {
+		_isSelected = value;
+    }
+
+	public void EnableHighlightOverride(bool value)
+    {
+		if (value) SelectionHighlight.SetActive(false);
+		else SelectionHighlight.SetActive(_isSelected);
+    }
 }
