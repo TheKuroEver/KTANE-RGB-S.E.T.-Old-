@@ -40,7 +40,7 @@ public class ColouredCubes : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     void Update()
