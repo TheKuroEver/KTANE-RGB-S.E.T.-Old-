@@ -412,6 +412,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bomb: {fileID: 553505901}
   Audio: {fileID: 553505902}
+  ScreenButton: {fileID: 1945683464}
   Cubes:
   - {fileID: 249505337}
   - {fileID: 901691689}
@@ -1695,7 +1696,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1296720983}
-  m_Text: Pink
+  m_Text: Start
   m_OffsetZ: 0
   m_CharacterSize: 0.0015
   m_LineSpacing: 1

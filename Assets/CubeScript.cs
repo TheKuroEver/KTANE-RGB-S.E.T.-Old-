@@ -19,9 +19,11 @@ public class CubeScript : MonoBehaviour {
 	private bool _isChangingSize = false;
 	private bool _isChangingColour = false;
 	private bool _isSelected = false;
-	private bool _isHidden = false;
+	private bool _isHidden = true;
+	private bool _isMoving = false;
 
 	private string _colourAsName;
+	private string _SETValue;
 
 	public string ColourAsName
 	{
@@ -41,6 +43,9 @@ public class CubeScript : MonoBehaviour {
 		}
 	}
 	public bool IsChangingColour { get { return _isChangingColour; } }
+	public bool IsBusy { get { return _isChangingSize || IsChangingColour || _isMoving; } }
+	public bool IsSelected { get { return _isSelected; } }
+	public string SETValue { get { return _SETValue; } }
 
 	private readonly Dictionary<string, string> TernaryToColourName = new Dictionary<string, string>()
 	{
@@ -77,9 +82,19 @@ public class CubeScript : MonoBehaviour {
 		_cubeMeshRenderer = GetComponentInParent<MeshRenderer>();
 		_cubeTransform = GetComponentInParent<Transform>();
 		_position = GetPositionFromName();
-
 		_cubeMeshRenderer.material.color = Color.white;
+		_cubeTransform.position = new Vector3(_cubeTransform.position.x, -0.04f, _cubeTransform.position.z);
 	}
+
+	public void SetStateFromSETValues(string SETValues)
+    {
+		_SETValue = SETValues;
+
+		Debug.Log(_cubeTransform.name + " values: " + _SETValue);
+
+		ChangeColour(_SETValue[0] - '0', _SETValue[1] - '0', _SETValue[2] - '0');
+		ChangeSize(_SETValue[3] - '0');
+    }
 
 	private int[] GetPositionFromName()
 	{
@@ -114,6 +129,7 @@ public class CubeScript : MonoBehaviour {
     {
 		if (value == _isHidden) return;
 
+		_isMoving = true;
 		_isHidden = value;
 		StartCoroutine(MoveToHidden(value));
     }
@@ -180,7 +196,7 @@ public class CubeScript : MonoBehaviour {
 	private IEnumerator	MoveToHidden(bool value)
     {
 		Vector3 startPosition = _cubeTransform.localPosition;
-		float transitionTime = 1;
+		float transitionTime = 2;
 		float elapsedTime = 0;
 		float transitionProgress;
 		float newY = value ? -0.04f : 0;
@@ -197,11 +213,15 @@ public class CubeScript : MonoBehaviour {
 			_cubeTransform.localPosition = new Vector3(startPosition.x, currentTransitionY, startPosition.z);
 			yield return null;
 		}
+
+		_isMoving = false;
 	}
 
 	public void EnableSelectionHighlight(bool value)
     {
 		_isSelected = value;
+		SelectionHighlight.SetActive(value);
+		EnableHighlightOverride(true);
     }
 
 	public void EnableHighlightOverride(bool value)
