@@ -13,9 +13,10 @@ public class CubeScript : MonoBehaviour {
 	private Transform _cubeTransform;
 
 	private int[] _position;
-	private int[] _colourAsTernaryValues = new int[] { 2, 2, 2 };
 	private int _size = 2;
 
+	[SerializeField]
+	private int[] _colourAsTernaryValues;
 	private bool _isChangingSize = false;
 	private bool _isChangingColour = false;
 	private bool _isSelected = false;
@@ -82,7 +83,6 @@ public class CubeScript : MonoBehaviour {
 		_cubeMeshRenderer = GetComponentInParent<MeshRenderer>();
 		_cubeTransform = GetComponentInParent<Transform>();
 		_position = GetPositionFromName();
-		_cubeMeshRenderer.material.color = Color.white;
 		_cubeTransform.position = new Vector3(_cubeTransform.position.x, -0.04f, _cubeTransform.position.z);
 	}
 
