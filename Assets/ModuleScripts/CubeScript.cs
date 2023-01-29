@@ -22,6 +22,7 @@ public class CubeScript : MonoBehaviour {
 	private bool _isSelected = false;
 	private bool _isHidden = true;
 	private bool _isMoving = false;
+	private bool _hideSelection = false;
 
 	private string _colourAsName;
 	private string _SETValue;
@@ -43,10 +44,11 @@ public class CubeScript : MonoBehaviour {
 			return _colourAsName;
 		}
 	}
+	public string SETValue { get { return _SETValue; } }
 	public bool IsChangingColour { get { return _isChangingColour; } }
 	public bool IsBusy { get { return _isChangingSize || IsChangingColour || _isMoving; } }
 	public bool IsSelected { get { return _isSelected; } }
-	public string SETValue { get { return _SETValue; } }
+	public int[] Position { get { return _position; } }
 
 	private readonly Dictionary<string, string> TernaryToColourName = new Dictionary<string, string>()
 	{
@@ -217,6 +219,12 @@ public class CubeScript : MonoBehaviour {
 		_isMoving = false;
 	}
 
+	public void SetSelectionHiding(bool value)
+    {
+		_hideSelection = value;
+		SelectionHighlight.SetActive(!_hideSelection && _isSelected);
+	}
+
 	public void EnableSelectionHighlight(bool value)
     {
 		_isSelected = value;
@@ -227,6 +235,6 @@ public class CubeScript : MonoBehaviour {
 	public void EnableHighlightOverride(bool value)
     {
 		if (value) SelectionHighlight.SetActive(false);
-		else SelectionHighlight.SetActive(_isSelected);
+		else SelectionHighlight.SetActive(!_hideSelection && _isSelected);
     }
 }

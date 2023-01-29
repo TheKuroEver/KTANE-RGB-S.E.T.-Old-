@@ -28,6 +28,8 @@ public class ColouredCubes : MonoBehaviour
     private string[] _stageThreeSETValues;
     private string[] _currentCorrectValues;
     private bool _allowButtonSelection = false;
+    private bool _allowScreenSelection = true;
+    private bool _displayingSizeChart = false;
 
     void Awake()
     {
@@ -113,17 +115,68 @@ public class ColouredCubes : MonoBehaviour
 
     void ScreenPress()
     {
+        if (!_allowScreenSelection) return;
+
         if (_stageNumber == 0)
         {
             _stageNumber++;
 
             _stageOneSETValues = SETGenerator.GenerateSetList();
             _currentCorrectValues = SETGenerator.CorrectAnswers;
-            StartCoroutine(StartAnimation());
+            StartCoroutine(StageOneAnimation());
+        }
+        else if (!_displayingSizeChart)
+        {
+            StartCoroutine(ShowSizeChart());
+        }
+        else if (_displayingSizeChart)
+        {
+            StartCoroutine(HideSizeChart());
         }
     }
 
-    IEnumerator StartAnimation()
+    IEnumerator ShowSizeChart()
+    {
+        var sizeChart = new Dictionary<int, int>() { { 0, 0 }, { 1, 1 }, { 2, 2 }, { 3, 1 }, { 4, 0 } };
+
+        _screen.EnableOverride("...");
+        _allowButtonSelection = false;
+        _allowScreenSelection = false;
+        _displayingSizeChart = true;
+
+        foreach (CubeScript cube in Cubes)
+        {
+            cube.SetSelectionHiding(true);
+            cube.ChangeColour(2, 1, 2);
+            cube.ChangeSize(sizeChart[cube.Position[0] + cube.Position[1]]);
+        }
+
+        yield return null;
+        while (CubesBusy()) yield return null;
+
+        _screen.EnableOverride("Size Chart");
+        _allowScreenSelection = true;
+    }
+
+    IEnumerator HideSizeChart()
+    {
+        _screen.DisableOverride();
+        _displayingSizeChart = false;
+        _allowScreenSelection = false;
+
+        if (_stageNumber == 1)
+        {
+            StartCoroutine(StageOneAnimation());
+        }
+
+        yield return null;
+        while (CubesBusy()) yield return null;
+
+        _allowButtonSelection = true;
+        _allowScreenSelection = true;
+    }
+
+    IEnumerator StageOneAnimation()
     {
         _screen.EnableOverride("...");
         _screen.SetText("Stage 1");
@@ -131,6 +184,7 @@ public class ColouredCubes : MonoBehaviour
         foreach (CubeScript cube in Cubes)
         {
             cube.SetHiddenStatus(false);
+            cube.SetSelectionHiding(false);
         }
         yield return null;
 
