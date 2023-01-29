@@ -7,12 +7,20 @@ public static class PermsManager
     private static int[] permutation;
     private static List<Cycle> cycles;
 
+    public static string ayo = "";
+
+    public static int[] Permutation { get { return permutation; } }
+    public static List<Cycle> Cycles { get { return cycles; } }
+
     public static void GenerateRandomPermutationSequence()
     {
         cycles = new List<Cycle>();
         permutation = GetRandomPermutation();
-        
+
+        foreach (int i in permutation) ayo += i.ToString();
+
         SeperateIntoDisjointCycles();
+
     }
 
     private static void SeperateIntoDisjointCycles()
@@ -39,41 +47,48 @@ public static class PermsManager
         return endList.ToArray();
     }
 
-    private static Cycle FindCycle(int startPosition)
+    private static Cycle FindCycle(int startPosition) // NEEDS A REWRITE
     {
         var tempCycles = new List<int>() { permutation[startPosition] };
+        int lastAddedElement = permutation[startPosition];
+        int nextElement;
+
         permutation[startPosition] = -1;
 
-        while (permutation[tempCycles[tempCycles.Count - 1]] != -1)
+        while (permutation[lastAddedElement] != -1)
         {
-            tempCycles.Add(permutation[tempCycles[tempCycles.Count - 1]]);
-            permutation[tempCycles[tempCycles.Count - 1]] = -1;
+            nextElement = permutation[lastAddedElement];
+            tempCycles.Add(nextElement);
+            permutation[lastAddedElement] = -1;
+            lastAddedElement = nextElement;
         }
 
         return new Cycle(tempCycles.ToArray());
     }
 
-    private class Cycle
+    
+}
+
+public class Cycle
+{
+    public int[] _elements;
+
+    public Cycle(int[] elements)
     {
-        private int[] _elements;
+        _elements = elements;
+    }
 
-        public Cycle(int[] elements)
+    public int Permute(int number)
+    {
+        int counter = 0;
+        foreach (int element in _elements)
         {
-            _elements = elements;
-        }
-
-        public int Permute(int number)
-        {
-            int counter = 0;
-            foreach (int element in _elements)
+            if (element == number)
             {
-                if (element == number)
-                {
-                    return _elements[(counter + 1) % _elements.Length];
-                }
+                return _elements[(counter + 1) % _elements.Length];
             }
-
-            throw new System.InvalidOperationException("Element not in cycle.");
         }
+
+        throw new System.InvalidOperationException("Element not in cycle.");
     }
 }

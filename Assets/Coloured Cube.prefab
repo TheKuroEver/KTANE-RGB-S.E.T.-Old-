@@ -259,6 +259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1145804244244404}
+  _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114685892947590162
 MonoBehaviour:
   m_ObjectHideFlags: 1
