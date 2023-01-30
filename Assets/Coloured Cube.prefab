@@ -60,15 +60,9 @@ GameObject:
   - component: {fileID: 65102790354180178}
   - component: {fileID: 23172959198182372}
   - component: {fileID: 114929133786914552}
-<<<<<<< Updated upstream:Assets/Coloured Cube.prefab
   - component: {fileID: 114612683447988698}
   m_Layer: 0
   m_Name: Coloured Cube
-=======
-  - component: {fileID: 114633045951223664}
-  m_Layer: 0
-  m_Name: ColouredCube
->>>>>>> Stashed changes:Assets/ColouredCube.prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -253,11 +247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightScale: {x: 1, y: 1, z: 1}
   OutlineAmount: 0
-<<<<<<< Updated upstream:Assets/Coloured Cube.prefab
 --- !u!114 &114612683447988698
-=======
---- !u!114 &114633045951223664
->>>>>>> Stashed changes:Assets/ColouredCube.prefab
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -265,7 +255,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1590407719062176}
   m_Enabled: 1
   m_EditorHideFlags: 0
-<<<<<<< Updated upstream:Assets/Coloured Cube.prefab
   m_Script: {fileID: 11500000, guid: d8819a033adb05743bca52bf72a3d129, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -284,11 +273,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightScale: {x: 1, y: 1, z: 1}
   OutlineAmount: 0
-=======
-  m_Script: {fileID: 11500000, guid: faa5a8bb8bc4850498fe9c042b3cdf40, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
->>>>>>> Stashed changes:Assets/ColouredCube.prefab
 --- !u!114 &114929133786914552
 MonoBehaviour:
   m_ObjectHideFlags: 1
