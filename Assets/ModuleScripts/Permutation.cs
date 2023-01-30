@@ -71,10 +71,7 @@ public static class PermsManager
 
 public class Cycle
 {
-    private int[] _elements;
-
-    public int[] Elements { get { return _elements; } }
-    public int Order { get { return _elements.Length; } }
+    public int[] _elements;
 
     public Cycle(int[] elements)
     {
