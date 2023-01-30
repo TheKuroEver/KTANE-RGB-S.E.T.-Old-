@@ -107,6 +107,7 @@ public class Cycle
             {
                 return _elements[(counter + 1) % _elements.Length];
             }
+            counter++;
         }
 
         throw new System.InvalidOperationException("Element not in cycle.");
