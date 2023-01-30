@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using rnd = UnityEngine.Random;
 
 public static class PermsManager
@@ -20,7 +21,7 @@ public static class PermsManager
         foreach (int i in permutation) ayo += i.ToString();
 
         SeperateIntoDisjointCycles();
-
+        SplitIntoSmallerCycles();
     }
 
     private static void SeperateIntoDisjointCycles()
@@ -66,14 +67,33 @@ public static class PermsManager
         return new Cycle(tempCycles.ToArray());
     }
 
-    
+    private static void SplitIntoSmallerCycles()
+    {
+        var newCycles = new List<Cycle>();
+
+        for (int i = 0; i < cycles.Count; i++)
+        {
+            while (cycles[i].Order > 3)
+            {
+                newCycles.Add(new Cycle(cycles[i].Elements[0], cycles[i].Elements[1], cycles[i].Elements[2]));
+                cycles[i] = new Cycle(cycles[i].Elements.Where((_, index) => index >= 2).ToArray());
+            }
+
+            newCycles.Add(cycles[i]);
+        }
+
+        cycles = newCycles;
+    }
 }
 
 public class Cycle
 {
-    public int[] _elements;
+    private int[] _elements;
 
-    public Cycle(int[] elements)
+    public int[] Elements { get { return _elements; } }
+    public int Order { get { return _elements.Length; } }
+
+    public Cycle(params int[] elements)
     {
         _elements = elements;
     }

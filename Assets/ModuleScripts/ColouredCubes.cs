@@ -53,25 +53,6 @@ public class ColouredCubes : MonoBehaviour
 
     void Start()
     {
-        int counter = 0;
-        PermsManager.GenerateRandomPermutationSequence();
-
-        Debug.Log("(");
-        Debug.Log(PermsManager.ayo);
-        Debug.Log(")");
-
-        foreach (Cycle cycle in PermsManager.Cycles)
-        {
-
-            Debug.Log(counter.ToString() + "(");
-            foreach (int i in cycle._elements) Debug.Log(i.ToString());
-            Debug.Log(")" + counter.ToString());
-            counter++;
-        }
-    }
-
-    void Update()
-    {
 
     }
 
