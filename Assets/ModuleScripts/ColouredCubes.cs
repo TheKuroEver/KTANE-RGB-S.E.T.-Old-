@@ -118,6 +118,7 @@ public class ColouredCubes : MonoBehaviour
 
         if (_stageNumber == 0)
         {
+            ReorderCubes();
             _stageNumber++;
 
             _stageOneSETValues = SETGenerator.GenerateSetList();
@@ -138,7 +139,7 @@ public class ColouredCubes : MonoBehaviour
     // In hindsight, I see so many things I could have written better; maybe I'll come back to clean it up at some point!
     IEnumerator ShowSizeChart()
     {
-        var sizeChart = new Dictionary<int, int>() { { 0, 0 }, { 1, 1 }, { 2, 2 }, { 3, 1 }, { 4, 0 } };
+        var sizeChart = new Dictionary<int, int>() { { -2, 0 }, { -1, 1 }, { 0, 2 }, { 1, 1 }, { 2, 0 } };
 
         _screen.EnableOverride("...");
         _allowButtonSelection = false;
@@ -254,6 +255,7 @@ public class ColouredCubes : MonoBehaviour
 
         do { yield return null; } while (CubesBusy());
 
+        ReorderCubes();
         _screen.DisableOverride();
         _allowButtonSelection = true;
     }
@@ -277,6 +279,24 @@ public class ColouredCubes : MonoBehaviour
         {
             cube.EnableSelectionHighlight(false);
         }
+    }
+
+    void ReorderCubes() // This is for gamepad support.
+    {
+        int row;
+        int col;
+        int pos;
+
+        foreach (CubeScript cube in Cubes)
+        {
+            col = cube.Position[0];
+            row = cube.Position[1];
+            pos = 5 + col + 4 * (1 + row);
+
+            GetComponentInParent<KMSelectable>().Children[pos] = cube.GetComponentInParent<KMSelectable>();
+        }
+
+        GetComponentInParent<KMSelectable>().UpdateChildren();
     }
 
     bool CubesBusy()
