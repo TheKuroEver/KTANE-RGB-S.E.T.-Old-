@@ -101,10 +101,10 @@ public class CubeScript : MonoBehaviour {
 	private int[] GetPositionFromName()
 	{
 		string name = GetComponentInParent<Transform>().name;
-		int row = name[1] - '1';
-		int column = "ABC".IndexOf(name[0]);
+		int row = name[1] - '2';
+		int column = "ABC".IndexOf(name[0]) - 1;
 
-		return new int[] { row, column };
+		return new int[] { column, row };
 	}
 
 	public void ChangeSize(int newSize)
@@ -127,13 +127,22 @@ public class CubeScript : MonoBehaviour {
 		StartCoroutine(SetColourTo(newRedValue, newGreenValue, newBlueValue));
 	}
 
-	public void SetHiddenStatus(bool value)
+	public void SetHiddenStatus(bool value, float transitionTime = 1)
     {
 		if (value == _isHidden) return;
 
 		_isMoving = true;
 		_isHidden = value;
-		StartCoroutine(MoveToHidden(value));
+		StartCoroutine(MoveToHidden(value, transitionTime));
+    }
+
+	public void ChangePosition(int[] newPosition)
+    {
+		if (_isMoving) return;
+		if (_position[0] == newPosition[0] && _position[1] == newPosition[1]) return;
+
+		_isMoving = true;
+		StartCoroutine(SetPositionTo(newPosition));
     }
 
 	private IEnumerator SetSizeTo(int newSize)
@@ -195,10 +204,9 @@ public class CubeScript : MonoBehaviour {
 		_isChangingColour = false;
 	}
 
-	private IEnumerator	MoveToHidden(bool value)
+	private IEnumerator	MoveToHidden(bool value, float transitionTime)
     {
 		Vector3 startPosition = _cubeTransform.localPosition;
-		float transitionTime = 2;
 		float elapsedTime = 0;
 		float transitionProgress;
 		float newY = value ? -0.04f : 0;
@@ -217,6 +225,31 @@ public class CubeScript : MonoBehaviour {
 		}
 
 		_isMoving = false;
+	}
+
+	private IEnumerator SetPositionTo(int[] newPosition)
+    {
+		float transitionTime = 1;
+		float elapsedTime = 0;
+		float transitionProgress;
+		float xDifference = newPosition[0] - _position[0];
+		float zDifference = newPosition[1] - _position[1];
+		Vector3 currentTransitionPosition;
+
+		yield return null;
+
+		while (elapsedTime <= transitionTime)
+		{
+			elapsedTime += Time.deltaTime;
+			transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
+			currentTransitionPosition = new Vector3(0.04f * (_position[0] + transitionProgress * xDifference), _cubeTransform.localPosition.y, -0.04f * (_position[1] + transitionProgress * zDifference));
+			
+			_cubeTransform.localPosition = currentTransitionPosition;
+			yield return null;
+		}
+
+		_isMoving = false;
+		_position = new int[] { newPosition[0], newPosition[1] };
 	}
 
 	public void SetSelectionHiding(bool value)

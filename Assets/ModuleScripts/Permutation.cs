@@ -7,18 +7,13 @@ public static class PermsManager
 {
     private static int[] permutation;
     private static List<Cycle> cycles;
-
-    public static string ayo = "";
-
-    public static int[] Permutation { get { return permutation; } }
+    private static int[] Permutation { get { return permutation; } }
     public static List<Cycle> Cycles { get { return cycles; } }
 
     public static void GenerateRandomPermutationSequence()
     {
         cycles = new List<Cycle>();
         permutation = GetRandomPermutation();
-
-        foreach (int i in permutation) ayo += i.ToString();
 
         SeperateIntoDisjointCycles();
         SplitIntoSmallerCycles();
@@ -111,5 +106,10 @@ public class Cycle
         }
 
         throw new System.InvalidOperationException("Element not in cycle.");
+    }
+
+    public bool Contains(int position)
+    {
+        return _elements.Contains(position);
     }
 }

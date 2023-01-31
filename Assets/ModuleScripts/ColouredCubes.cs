@@ -26,7 +26,9 @@ public class ColouredCubes : MonoBehaviour
     private string[] _stageOneSETValues;
     private string[] _stageTwoSETValues;
     private string[] _stageThreeSETValues;
-    private string[] _currentCorrectValues;
+    private string[] _stageOneCorrectValues;
+    private string[] _stageTwoCorrectValues;
+    private string[] _stageThreeCorrectValues;
     private bool _allowButtonSelection = false;
     private bool _allowScreenSelection = true;
     private bool _displayingSizeChart = false;
@@ -93,13 +95,15 @@ public class ColouredCubes : MonoBehaviour
         {
             _screen.EnableOverride("INCORRECT!");
         }
+
+        StartCoroutine(StageTwoAnimation());
     }
 
     bool SubmissionCorrect()
     {
         foreach (CubeScript cube in Cubes)
         {
-            if (cube.IsSelected && !Array.Exists(_currentCorrectValues, element => element == cube.SETValue))
+            if (cube.IsSelected && !Array.Exists(_stageOneCorrectValues, element => element == cube.SETValue))
             {
                 return false;
             }
@@ -117,7 +121,7 @@ public class ColouredCubes : MonoBehaviour
             _stageNumber++;
 
             _stageOneSETValues = SETGenerator.GenerateSetList();
-            _currentCorrectValues = SETGenerator.CorrectAnswers;
+            _stageOneCorrectValues = SETGenerator.CorrectAnswers;
             StartCoroutine(StageOneAnimation());
         }
         else if (!_displayingSizeChart)
@@ -130,6 +134,8 @@ public class ColouredCubes : MonoBehaviour
         }
     }
 
+    // This is my first experience with coroutines (also only my second mod) so the code is bad. Sorry. Not as bad as The Cipher Ever though.
+    // In hindsight, I see so many things I could have written better; maybe I'll come back to clean it up at some point!
     IEnumerator ShowSizeChart()
     {
         var sizeChart = new Dictionary<int, int>() { { 0, 0 }, { 1, 1 }, { 2, 2 }, { 3, 1 }, { 4, 0 } };
@@ -146,8 +152,7 @@ public class ColouredCubes : MonoBehaviour
             cube.ChangeSize(sizeChart[cube.Position[0] + cube.Position[1]]);
         }
 
-        yield return null;
-        while (CubesBusy()) yield return null;
+        do { yield return null; } while (CubesBusy());
 
         _screen.EnableOverride("Size Chart");
         _allowScreenSelection = true;
@@ -164,8 +169,7 @@ public class ColouredCubes : MonoBehaviour
             StartCoroutine(StageOneAnimation());
         }
 
-        yield return null;
-        while (CubesBusy()) yield return null;
+        do { yield return null; } while (CubesBusy());
 
         _allowButtonSelection = true;
         _allowScreenSelection = true;
@@ -178,23 +182,101 @@ public class ColouredCubes : MonoBehaviour
 
         foreach (CubeScript cube in Cubes)
         {
-            cube.SetHiddenStatus(false);
+            cube.SetHiddenStatus(false, 2);
             cube.SetSelectionHiding(false);
         }
-        yield return null;
 
-        while (CubesBusy()) yield return null;
+        do { yield return null; } while (CubesBusy());
 
         for (int i = 0; i < 9; i++)
         {
             Cubes[i].SetStateFromSETValues(_stageOneSETValues[i]);
         }
-        yield return null;
 
-        while (CubesBusy()) yield return null;
+        do { yield return null; } while (CubesBusy());
 
         _screen.DisableOverride();
         _allowButtonSelection = true;
+    }
+
+    IEnumerator StageTwoAnimation()
+    {
+        int position;
+
+        DeselectAllCubes();
+
+        _allowButtonSelection = false;
+        _screen.EnableOverride("...");
+        _screen.SetText("Stage 2");
+
+        foreach (CubeScript cube in Cubes)
+        {
+            cube.ChangeColour(1, 1, 1);
+            cube.ChangeSize(0);
+        }
+
+        do { yield return null; } while (CubesBusy());
+
+        PermsManager.GenerateRandomPermutationSequence();
+
+        foreach (Cycle cycle in PermsManager.Cycles)
+        {
+            foreach (CubeScript cube in Cubes) 
+            {
+                position = GetPositionNumberFromCube(cube);
+                if (!cycle.Contains(position)) cube.SetHiddenStatus(true);
+                else cube.SetHiddenStatus(false);
+            }
+
+            do { yield return null; } while (CubesBusy());
+
+            foreach (CubeScript cube in Cubes)
+            {
+                position = GetPositionNumberFromCube(cube);
+                if (cycle.Contains(position)) cube.ChangePosition(GetPositionFromNumber(cycle.Permute(position)));
+            }
+
+            do { yield return null; } while (CubesBusy());
+        }
+
+        foreach (CubeScript cube in Cubes)
+        {
+            cube.SetHiddenStatus(false);
+        }
+
+        _stageTwoSETValues = SETGenerator.GenerateSetList();
+        _stageTwoCorrectValues = SETGenerator.CorrectAnswers;
+
+        for (int i = 0; i < 9; i++)
+        {
+            Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
+        }
+
+        do { yield return null; } while (CubesBusy());
+
+        _screen.DisableOverride();
+        _allowButtonSelection = true;
+    }
+
+    // These two methods look a bit confusing because we are taking position in *reading order* so we have to invert z.
+    int GetPositionNumberFromCube(CubeScript cube)
+    {
+        return (cube.Position[0] + 1) + ((-cube.Position[1] + 1) * 3);
+    }
+
+    int[] GetPositionFromNumber(int number)
+    {
+        return new int[] { (number % 3) - 1, 1 - (number / 3)};
+    }
+
+    void DeselectAllCubes()
+    {
+        _numOfSelectedCubes = 0;
+        
+        foreach (CubeScript cube in Cubes)
+        {
+            cube.EnableSelectionHighlight(false);
+        }
     }
 
     bool CubesBusy()
