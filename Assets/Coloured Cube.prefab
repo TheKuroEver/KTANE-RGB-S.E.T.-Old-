@@ -61,6 +61,7 @@ GameObject:
   - component: {fileID: 23172959198182372}
   - component: {fileID: 114929133786914552}
   - component: {fileID: 114612683447988698}
+  - component: {fileID: 114049664802351326}
   m_Layer: 0
   m_Name: Coloured Cube
   m_TagString: Untagged
@@ -234,6 +235,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114049664802351326
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1590407719062176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Mobile/DiffuseTint
 --- !u!114 &114105716104628964
 MonoBehaviour:
   m_ObjectHideFlags: 1

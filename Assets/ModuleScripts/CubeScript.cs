@@ -85,7 +85,7 @@ public class CubeScript : MonoBehaviour {
 		_cubeMeshRenderer = GetComponentInParent<MeshRenderer>();
 		_cubeTransform = GetComponentInParent<Transform>();
 		_position = GetPositionFromName();
-		_cubeTransform.position = new Vector3(_cubeTransform.position.x, -0.04f, _cubeTransform.position.z);
+		_cubeTransform.localPosition = new Vector3(_cubeTransform.localPosition.x, -0.04f, _cubeTransform.localPosition.z);
 	}
 
 	public void SetStateFromSETValues(string SETValues)
