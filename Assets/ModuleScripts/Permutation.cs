@@ -7,7 +7,6 @@ public static class PermsManager
 {
     private static int[] permutation;
     private static List<Cycle> cycles;
-    private static int[] Permutation { get { return permutation; } }
     public static List<Cycle> Cycles { get { return cycles; } }
 
     public static void GenerateRandomPermutationSequence()

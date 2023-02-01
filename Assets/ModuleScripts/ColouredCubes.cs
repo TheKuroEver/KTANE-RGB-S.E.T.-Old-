@@ -199,12 +199,12 @@ public class ColouredCubes : MonoBehaviour
     {
         if (SubmissionCorrect(_stageOneCorrectValues))
         {
-            _stageNumber++;
+            _stageNumber = 2;
             StartCoroutine(StageTwoAnimation());
         }
         else
         {
-            _stageNumber++;
+            _stageNumber = 2;
             StartCoroutine(StageTwoAnimation());
         }
     }
@@ -229,9 +229,9 @@ public class ColouredCubes : MonoBehaviour
         if (_stageNumber == 0)
         {
             ReorderCubes();
-            _stageNumber++;
+            _stageNumber = 1;
 
-            StartCoroutine(StageOneAnimation());
+            StartCoroutine(StageOneAnimation(true));
         }
         else if (!_displayingSizeChart)
         {
@@ -245,11 +245,11 @@ public class ColouredCubes : MonoBehaviour
 
     void StageLightPress(KMSelectable pressedLight)
     {
-        if (!_allowScreenSelection || !_allowButtonSelection) return;
+        if (!_allowScreenSelection || _displayingSizeChart) return;
 
         if (pressedLight.name == "Stage1Light" && _displayedStage != 1)
         {
-            StartCoroutine(StageOneAnimation());
+            StartCoroutine(StageOneAnimation(true));
         }
         else if (pressedLight.name == "Stage2Light" && _displayedStage != 2 && _stageNumber >= 2)
         {
@@ -289,7 +289,7 @@ public class ColouredCubes : MonoBehaviour
 
         if (_stageNumber == 1)
         {
-            StartCoroutine(StageOneAnimation());
+            StartCoroutine(StageOneAnimation(false));
         }
         else if (_stageNumber == 2)
         {
@@ -299,6 +299,7 @@ public class ColouredCubes : MonoBehaviour
             for (int i = 0; i < 9; i++)
             {
                 Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
+                Cubes[i].SetSelectionHiding(false);
             }
         }
 
@@ -309,9 +310,9 @@ public class ColouredCubes : MonoBehaviour
         _allowScreenSelection = true;
     }
 
-    IEnumerator StageOneAnimation()
+    IEnumerator StageOneAnimation(bool deselect)
     {
-        DeselectAllCubes();
+        if (deselect) DeselectAllCubes();
 
         _allowButtonSelection = false;
         _allowScreenSelection = false;
@@ -338,8 +339,9 @@ public class ColouredCubes : MonoBehaviour
 
         _displayedStage = 1;
         _screen.DisableOverride();
-        _allowButtonSelection = true;
         _allowScreenSelection = true;
+
+        if (_stageNumber == 1) _allowButtonSelection = true;
     }
 
     IEnumerator StageTwoAnimation()
@@ -383,6 +385,7 @@ public class ColouredCubes : MonoBehaviour
         foreach (CubeScript cube in Cubes)
         {
             cube.SetHiddenStatus(false);
+            cube.SetSelectionHiding(false);
         }
 
         for (int i = 0; i < 9; i++)
@@ -397,7 +400,8 @@ public class ColouredCubes : MonoBehaviour
         _displayedStage = 2;
         ReorderCubes();
         _screen.DisableOverride();
-        _allowButtonSelection = true;
+
+        if (_stageNumber == 2) _allowButtonSelection = true;
     }
 
     // These two methods look a bit confusing because we are taking position in *reading order* so we have to invert z.
@@ -516,6 +520,7 @@ public class ColouredCubes : MonoBehaviour
             UpdateScreen();
         }
 
+        // Priority is Override > ColourName > Text.
         public void EnableOverride(string overrideText)
         {
             _screenText.text = overrideText;
