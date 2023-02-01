@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CubeScript : MonoBehaviour {
+public class CubeScript : MonoBehaviour
+{
 
 	[SerializeField]
 	private GameObject SelectionHighlight;
@@ -66,7 +67,7 @@ public class CubeScript : MonoBehaviour {
 		{"101", "Plum" },
 		{"102", "Violet" },
 		{"110", "Olive" },
-		{"111", "Gray" },
+		{"111", "Grey" },
 		{"112", "Maya" },
 		{"120", "Lime" },
 		{"121", "Mint" },

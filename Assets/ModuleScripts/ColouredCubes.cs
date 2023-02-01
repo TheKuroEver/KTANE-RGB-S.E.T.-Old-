@@ -27,11 +27,8 @@ public class ColouredCubes : MonoBehaviour
     private int _displayedStage;
     private int _numOfSelectedCubes = 0;
 
-    private int[] _stageOneLightColourValues;
-    private int[] _stageTwoLightColourValues;
-
-    private string[] _StageOneLightColours;
-    private string[] _StageTwoLightColours;
+    private Color[] _stageOneLightColours = new Color[3];
+    private Color[] _stageTwoLightColours = new Color[3];
 
     private string[] _stageOneSETValues;
     private string[] _stageTwoSETValues;
@@ -39,10 +36,31 @@ public class ColouredCubes : MonoBehaviour
     private string[] _stageOneCorrectValues;
     private string[] _stageTwoCorrectValues;
     private string[] _stageThreeCorrectValues;
+    private string[] _stageOneLightColourNames = new string[3];
+    private string[] _stageTwoLightColourNames = new string[3];
 
     private bool _allowButtonSelection = false;
     private bool _allowScreenSelection = true;
     private bool _displayingSizeChart = false;
+
+    private readonly Dictionary<string, string> BinaryColourToName = new Dictionary<string, string>()
+    {
+        { "111", "White" },
+        { "101", "Magenta" },
+        { "011", "Cyan" },
+        { "110", "Yellow" },
+        { "100", "Red" },
+        { "010", "Green" },
+        { "001", "Blue" },
+        { "000", "Black" }
+    };
+
+    private readonly Dictionary<string, int> StageLightToPositionNumber = new Dictionary<string, int>()
+    {
+        { "Stage1Light", 0 },
+        { "Stage2Light", 1 },
+        { "Stage3Light", 2 },
+    };
 
     void Awake()
     {
@@ -64,11 +82,14 @@ public class ColouredCubes : MonoBehaviour
         foreach (KMSelectable stageLight in StageLights)
         {
             stageLight.OnInteract += delegate () { StageLightPress(stageLight); return false; };
+            stageLight.OnHighlight += delegate () { DisplayStageLightColourName(stageLight); };
+            stageLight.OnHighlightEnded += delegate () { _screen.EndColourNameDisplay(); };
         }
 
         _screen.EnableOverride("Start");
 
         PermsManager.GenerateRandomPermutationSequence();
+        GenerateStageLightColours();
 
         _stageOneSETValues = SETGenerator.GenerateSetList();
         _stageOneCorrectValues = SETGenerator.CorrectAnswers;
@@ -79,6 +100,72 @@ public class ColouredCubes : MonoBehaviour
     void Start()
     {
 
+    }
+
+    void GenerateStageLightColours()
+    {
+        int[] colourValues;
+        int redPosition = Rnd.Range(0, 3);
+        int greenPosition = Rnd.Range(0, 3);
+        int bluePosition = Rnd.Range(0, 3);
+
+        for (int i = 0; i < 3; i++)
+        {
+            colourValues = new int[] { 0, 0, 0 };
+            if (i == redPosition) colourValues[0] = 1;
+            if (i == greenPosition) colourValues[1] = 1;
+            if (i == bluePosition) colourValues[2] = 1;
+
+            _stageOneLightColours[i] = new Color(colourValues[0], colourValues[1], colourValues[2]);
+            _stageOneLightColourNames[i] = BinaryColourToName[colourValues[0].ToString() + colourValues[1].ToString() + colourValues[2].ToString()];
+        }
+
+        redPosition = Rnd.Range(0, 3);
+        greenPosition = Rnd.Range(0, 3);
+        bluePosition = Rnd.Range(0, 3);
+
+        for (int i = 0; i < 3; i++)
+        {
+            colourValues = new int[] { 1, 1, 1 };
+            if (i == redPosition) colourValues[0] = 0;
+            if (i == greenPosition) colourValues[1] = 0;
+            if (i == bluePosition) colourValues[2] = 0;
+
+            _stageTwoLightColours[i] = new Color(colourValues[0], colourValues[1], colourValues[2]);
+            _stageTwoLightColourNames[i] = BinaryColourToName[colourValues[0].ToString() + colourValues[1].ToString() + colourValues[2].ToString()];
+        }
+    }
+
+    void SetStageLightColours(int stageNumber)
+    {
+        if (stageNumber == 1)
+        {
+            for (int i = 0; i < 3; i++) StageLights[i].GetComponentInParent<MeshRenderer>().material.color = _stageOneLightColours[i];
+        }
+        else if (stageNumber == 2)
+        {
+            for (int i = 0; i < 3; i++) StageLights[i].GetComponentInParent<MeshRenderer>().material.color = _stageTwoLightColours[i];
+        }
+        else
+        {
+            foreach (KMSelectable stageLight in StageLights) stageLight.GetComponentInParent<MeshRenderer>().material.color = Color.black;
+        }
+    }
+
+    void DisplayStageLightColourName(KMSelectable stageLight)
+    {
+        int position = StageLightToPositionNumber[stageLight.name];
+
+        if (_stageNumber == 0) return;
+
+        if (_stageNumber == 1)
+        {
+            _screen.DisplayColourName(_stageOneLightColourNames[position]);
+        }
+        else if (_stageNumber == 2)
+        {
+            _screen.DisplayColourName(_stageTwoLightColourNames[position]);
+        }
     }
 
     void ButtonPress(CubeScript cube) // Need to add a sound effect on selections.
@@ -110,22 +197,23 @@ public class ColouredCubes : MonoBehaviour
 
     void HandleStageOne()
     {
-        if (SubmissionCorrect())
+        if (SubmissionCorrect(_stageOneCorrectValues))
         {
             _stageNumber++;
             StartCoroutine(StageTwoAnimation());
         }
         else
         {
+            _stageNumber++;
             StartCoroutine(StageTwoAnimation());
         }
     }
 
-    bool SubmissionCorrect()
+    bool SubmissionCorrect(string[] correctValues)
     {
         foreach (CubeScript cube in Cubes)
         {
-            if (cube.IsSelected && !Array.Exists(_stageOneCorrectValues, element => element == cube.SETValue))
+            if (cube.IsSelected && !Array.Exists(correctValues, element => element == cube.SETValue))
             {
                 return false;
             }
@@ -163,7 +251,7 @@ public class ColouredCubes : MonoBehaviour
         {
             StartCoroutine(StageOneAnimation());
         }
-        else if (pressedLight.name == "Stage2Light" && _displayedStage != 2)
+        else if (pressedLight.name == "Stage2Light" && _displayedStage != 2 && _stageNumber >= 2)
         {
             StartCoroutine(StageTwoAnimation());
         }
@@ -203,15 +291,28 @@ public class ColouredCubes : MonoBehaviour
         {
             StartCoroutine(StageOneAnimation());
         }
+        else if (_stageNumber == 2)
+        {
+            _screen.EnableOverride("...");
+            _screen.SetText("Stage 2");
+
+            for (int i = 0; i < 9; i++)
+            {
+                Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
+            }
+        }
 
         do { yield return null; } while (CubesBusy());
 
+        _screen.DisableOverride();
         _allowButtonSelection = true;
         _allowScreenSelection = true;
     }
 
     IEnumerator StageOneAnimation()
     {
+        DeselectAllCubes();
+
         _allowButtonSelection = false;
         _allowScreenSelection = false;
 
@@ -232,6 +333,8 @@ public class ColouredCubes : MonoBehaviour
         }
 
         do { yield return null; } while (CubesBusy());
+
+        SetStageLightColours(1);
 
         _displayedStage = 1;
         _screen.DisableOverride();
@@ -289,6 +392,8 @@ public class ColouredCubes : MonoBehaviour
 
         do { yield return null; } while (CubesBusy());
 
+        SetStageLightColours(2);
+
         _displayedStage = 2;
         ReorderCubes();
         _screen.DisableOverride();
@@ -334,7 +439,7 @@ public class ColouredCubes : MonoBehaviour
             newCubeOrder[4 + row + 3 * col] = cube;
         }
 
-        Cubes = newCubeOrder;
+        Cubes = newCubeOrder; // This is to ensure that going back stages preserves the original cube positions.
         GetComponentInParent<KMSelectable>().UpdateChildren();
     }
 
