@@ -82,7 +82,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1133892313646176
 GameObject:
   m_ObjectHideFlags: 1
@@ -230,7 +230,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1267514859552180
 GameObject:
   m_ObjectHideFlags: 1
@@ -414,7 +414,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1419423584242138
 GameObject:
   m_ObjectHideFlags: 1
@@ -587,7 +587,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1594511269576202
 GameObject:
   m_ObjectHideFlags: 1
@@ -624,7 +624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1676409040304040
 GameObject:
   m_ObjectHideFlags: 0
@@ -683,7 +683,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1772103259034946
 GameObject:
   m_ObjectHideFlags: 1
@@ -893,7 +893,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1966794309619504
 GameObject:
   m_ObjectHideFlags: 1
@@ -911,7 +911,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1967041935456026
 GameObject:
   m_ObjectHideFlags: 1
@@ -929,7 +929,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1985967612103922
 GameObject:
   m_ObjectHideFlags: 1
@@ -3706,7 +3706,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1419423584242138}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114057657818760420
 MonoBehaviour:
@@ -4015,7 +4014,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1990424258555174}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114287458087229142
 MonoBehaviour:
@@ -4055,7 +4053,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1237276381173874}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114350840874562092
 MonoBehaviour:
@@ -4121,7 +4118,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1366288567401572}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114398842746418764
 MonoBehaviour:
@@ -4192,7 +4188,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1775838996161072}
-  Highlight: {fileID: 1626052788673778}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114454383462897410
 MonoBehaviour:
@@ -4330,7 +4325,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1791005878057124}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114597496499035086
 MonoBehaviour:
@@ -4418,7 +4412,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1046950561209580}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114647420290332536
 MonoBehaviour:
@@ -4471,7 +4464,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1810497754436164}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114741067130555828
 MonoBehaviour:
@@ -4498,7 +4490,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionHighlight: {fileID: 1384400263892414}
-  Highlight: {fileID: 0}
   _colourAsTernaryValues: 010000000100000001000000
 --- !u!114 &114782849075359530
 MonoBehaviour:
@@ -4588,10 +4579,6 @@ MonoBehaviour:
   Bomb: {fileID: 114454383462897410}
   Audio: {fileID: 114915473299363512}
   ScreenButton: {fileID: 114782849075359530}
-  StageLights:
-  - {fileID: 114398842746418764}
-  - {fileID: 114190412217709626}
-  - {fileID: 114943584927482758}
   Cubes:
   - {fileID: 114449786898997414}
   - {fileID: 114305374624613370}

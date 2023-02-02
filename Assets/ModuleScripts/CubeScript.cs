@@ -26,7 +26,6 @@ public class CubeScript : MonoBehaviour {
 
 	private string _colourAsName;
 	private string _SETValue;
-	private string _displayedSETValue;
 
 	public string ColourAsName
 	{
@@ -92,23 +91,12 @@ public class CubeScript : MonoBehaviour {
 	public void SetStateFromSETValues(string SETValues)
     {
 		_SETValue = SETValues;
-		ModifySETValuesBasedOnPosition();
 
 		Debug.Log(_cubeTransform.name + " values: " + _SETValue);
 
-		ChangeColour(_displayedSETValue[0] - '0', _displayedSETValue[1] - '0', _displayedSETValue[2] - '0');
-		ChangeSize(_displayedSETValue[3] - '0');
+		ChangeColour(_SETValue[0] - '0', _SETValue[1] - '0', _SETValue[2] - '0');
+		ChangeSize(_SETValue[3] - '0');
     }
-
-	private void ModifySETValuesBasedOnPosition()
-	{
-		string rValue = (_position[1] == -1) ? ((_SETValue[0] + '1') % 3).ToString() : _SETValue[0].ToString();
-		string gValue = (_position[1] == 0) ? ((_SETValue[1] + '1') % 3).ToString() : _SETValue[1].ToString();
-		string bValue = (_position[1] == 1) ? ((_SETValue[2] + '1') % 3).ToString() : _SETValue[2].ToString();
-		string size = ((_SETValue[3] + Position[0] + 1) % 3).ToString();
-
-		_displayedSETValue = rValue + gValue + bValue + size;
-	}
 
 	private int[] GetPositionFromName()
 	{
@@ -281,13 +269,5 @@ public class CubeScript : MonoBehaviour {
     {
 		if (value) SelectionHighlight.SetActive(false);
 		else SelectionHighlight.SetActive(!_hideSelection && _isSelected);
-    }
-
-	public void FlashRed()
-    {
-		int[] cubeColour = _colourAsTernaryValues;
-		_cubeMeshRenderer.material.color = Color.red;
-		_colourAsTernaryValues = new int[] { 2, 0, 0 };
-		ChangeColour(cubeColour[0], cubeColour[1], cubeColour[2]);
     }
 }
