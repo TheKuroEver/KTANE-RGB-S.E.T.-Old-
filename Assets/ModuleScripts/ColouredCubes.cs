@@ -389,6 +389,8 @@ public class ColouredCubes : MonoBehaviour
             do { yield return null; } while (CubesBusy());
         }
 
+        ReorderCubes();
+
         foreach (CubeScript cube in Cubes)
         {
             cube.SetHiddenStatus(false);
@@ -406,7 +408,6 @@ public class ColouredCubes : MonoBehaviour
         SetStageLightColours(2);
 
         _displayedStage = 2;
-        ReorderCubes();
         _screen.DisableOverride();
 
         if (_stageNumber == 2) _allowButtonSelection = true;
@@ -444,11 +445,11 @@ public class ColouredCubes : MonoBehaviour
         {
             col = cube.Position[0];
             row = cube.Position[1];
-            pos = 5 + col + 4 * (1 + row);
+            pos = 5 + col + 4 * (1 - row);
 
             GetComponentInParent<KMSelectable>().Children[pos] = cube.GetComponentInParent<KMSelectable>();
 
-            newCubeOrder[4 + row + 3 * col] = cube;
+            newCubeOrder[4 - row + 3 * col] = cube;
         }
 
         Cubes = newCubeOrder; // This is to ensure that going back stages preserves the original cube positions.
