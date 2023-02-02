@@ -421,11 +421,7 @@ public class ColouredCubes : MonoBehaviour
 
     int[] GetPositionFromNumber(int number)
     {
-<<<<<<< HEAD
         return new int[] { (number % 3) - 1, (number / 3) - 1};
-=======
-        return new int[] { (number % 3) - 1, (number / 3) - 1 };
->>>>>>> a9584f9d51c826892f8acd488e72114d2fb54012
     }
 
     void DeselectAllCubes()
