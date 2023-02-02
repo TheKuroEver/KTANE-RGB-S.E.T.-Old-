@@ -92,9 +92,9 @@ public class ColouredCubes : MonoBehaviour
         GenerateStageLightColours();
 
         _stageOneSETValues = SETGenerator.GenerateSetList();
-        _stageOneCorrectValues = SETGenerator.CorrectAnswers;
+        _stageOneCorrectValues = SETGenerator.CorrectAnswers.ToArray();
         _stageTwoSETValues = SETGenerator.GenerateSetList();
-        _stageTwoCorrectValues = SETGenerator.CorrectAnswers;
+        _stageTwoCorrectValues = SETGenerator.CorrectAnswers.ToArray();
     }
 
     void Start()
@@ -200,12 +200,11 @@ public class ColouredCubes : MonoBehaviour
         if (SubmissionCorrect(_stageOneCorrectValues))
         {
             _stageNumber = 2;
-            StartCoroutine(StageTwoAnimation());
+            StartCoroutine(StageTwoAnimation(true));
         }
         else
         {
-            _stageNumber = 2;
-            StartCoroutine(StageTwoAnimation());
+            Strike();
         }
     }
 
@@ -253,7 +252,7 @@ public class ColouredCubes : MonoBehaviour
         }
         else if (pressedLight.name == "Stage2Light" && _displayedStage != 2 && _stageNumber >= 2)
         {
-            StartCoroutine(StageTwoAnimation());
+            StartCoroutine(StageTwoAnimation(true));
         }
     }
 
@@ -262,6 +261,8 @@ public class ColouredCubes : MonoBehaviour
     IEnumerator ShowSizeChart()
     {
         var sizeChart = new Dictionary<int, int>() { { -2, 0 }, { -1, 1 }, { 0, 2 }, { 1, 1 }, { 2, 0 } };
+
+        SetStageLightColours(3);
 
         _screen.EnableOverride("...");
         _allowButtonSelection = false;
@@ -287,11 +288,11 @@ public class ColouredCubes : MonoBehaviour
         _displayingSizeChart = false;
         _allowScreenSelection = false;
 
-        if (_stageNumber == 1)
+        if (_displayedStage == 1)
         {
             StartCoroutine(StageOneAnimation(false));
         }
-        else if (_stageNumber == 2)
+        else if (_displayedStage == 2)
         {
             _screen.EnableOverride("...");
             _screen.SetText("Stage 2");
@@ -301,6 +302,8 @@ public class ColouredCubes : MonoBehaviour
                 Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
                 Cubes[i].SetSelectionHiding(false);
             }
+
+            SetStageLightColours(2);
         }
 
         do { yield return null; } while (CubesBusy());
@@ -313,6 +316,8 @@ public class ColouredCubes : MonoBehaviour
     IEnumerator StageOneAnimation(bool deselect)
     {
         if (deselect) DeselectAllCubes();
+
+        SetStageLightColours(3);
 
         _allowButtonSelection = false;
         _allowScreenSelection = false;
@@ -331,6 +336,7 @@ public class ColouredCubes : MonoBehaviour
         for (int i = 0; i < 9; i++)
         {
             Cubes[i].SetStateFromSETValues(_stageOneSETValues[i]);
+            if (_stageOneCorrectValues.Contains(Cubes[i].SETValue)) Debug.Log("Correct cube at position " + GetPositionNumberFromCube(Cubes[i]).ToString());
         }
 
         do { yield return null; } while (CubesBusy());
@@ -344,11 +350,12 @@ public class ColouredCubes : MonoBehaviour
         if (_stageNumber == 1) _allowButtonSelection = true;
     }
 
-    IEnumerator StageTwoAnimation()
+    IEnumerator StageTwoAnimation(bool deselect)
     {
         int position;
 
-        DeselectAllCubes();
+        if (deselect) DeselectAllCubes();
+        SetStageLightColours(3);
 
         _allowButtonSelection = false;
         _screen.EnableOverride("...");
@@ -391,6 +398,7 @@ public class ColouredCubes : MonoBehaviour
         for (int i = 0; i < 9; i++)
         {
             Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
+            if (_stageTwoCorrectValues.Contains(Cubes[i].SETValue)) Debug.Log("Correct cube at position " + GetPositionNumberFromCube(Cubes[i]).ToString());
         }
 
         do { yield return null; } while (CubesBusy());
@@ -407,12 +415,12 @@ public class ColouredCubes : MonoBehaviour
     // These two methods look a bit confusing because we are taking position in *reading order* so we have to invert z.
     int GetPositionNumberFromCube(CubeScript cube)
     {
-        return (cube.Position[0] + 1) + ((-cube.Position[1] + 1) * 3);
+        return (cube.Position[0] + 1) + ((cube.Position[1] + 1) * 3);
     }
 
     int[] GetPositionFromNumber(int number)
     {
-        return new int[] { (number % 3) - 1, 1 - (number / 3)};
+        return new int[] { (number % 3) - 1, (number / 3) - 1};
     }
 
     void DeselectAllCubes()
@@ -463,8 +471,9 @@ public class ColouredCubes : MonoBehaviour
     void Strike()
     {
         foreach (CubeScript cube in Cubes) cube.FlashRed();
+        Module.HandleStrike();
 
-        Module.HandleStrike();   
+        DeselectAllCubes();
     }
 
     #pragma warning disable 414
