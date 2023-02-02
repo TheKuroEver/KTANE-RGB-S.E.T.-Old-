@@ -67,7 +67,7 @@ public class CubeScript : MonoBehaviour
 		{"101", "Plum" },
 		{"102", "Violet" },
 		{"110", "Olive" },
-		{"111", "Gray" },
+		{"111", "Grey" },
 		{"112", "Maya" },
 		{"120", "Lime" },
 		{"121", "Mint" },
@@ -95,8 +95,6 @@ public class CubeScript : MonoBehaviour
 	{
 		_SETValue = SETValues;
 		ModifySETValuesBasedOnPosition();
-
-		Debug.Log(_cubeTransform.name + " values: " + _SETValue);
 
 		ChangeColour(_displayedSETValue[0] - '0', _displayedSETValue[1] - '0', _displayedSETValue[2] - '0');
 		ChangeSize(_displayedSETValue[3] - '0');
