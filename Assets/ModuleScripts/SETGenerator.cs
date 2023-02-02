@@ -8,10 +8,10 @@ public static class SETGenerator
 
     public static string[] CorrectAnswers { get { return correctAnswers; } }
 
-    public static string[] GenerateSetList()
+    public static string[] GenerateSetList(bool stageThree = false)
     {
-        List<int> correctPositions = GetCorrectAnswersAndPositions();
-        int correctValueCounter = 0;
+        List<int> correctPositions = GetCorrectAnswersAndPositions(stageThree);
+        int correctValueCounter = stageThree ? 1 : 0;
         int position;
 
         var newList = new List<string>();
@@ -37,6 +37,13 @@ public static class SETGenerator
         return newList.ToArray();
     }
 
+    public static string[] GenerateSetList(string stageOneValues, string stageTwoValues)
+    {
+        correctAnswers[0] = FindMatchingSet(stageOneValues, stageTwoValues);
+
+        return GenerateSetList(true);
+    }
+
     private static void GenerateEveryPossibleValue()
     {
         availableValues = new List<string>();
@@ -50,7 +57,7 @@ public static class SETGenerator
                     }
     }
 
-    private static List<int> GetCorrectAnswersAndPositions()
+    private static List<int> GetCorrectAnswersAndPositions(bool stageThree = false)
     {
         int position;
         var correctPositions = new List<int>() { rnd.Range(0, 9), rnd.Range(0, 9), rnd.Range(0, 9) };
@@ -61,9 +68,17 @@ public static class SETGenerator
 
         GenerateEveryPossibleValue();
 
-        position = rnd.Range(0, availableValues.Count);
-        correctAnswers[0] = availableValues[position];
-        availableValues.RemoveAt(position);
+        if (!stageThree)
+        {
+            position = rnd.Range(0, availableValues.Count);
+            correctAnswers[0] = availableValues[position];
+            availableValues.RemoveAt(position);
+        }
+        else
+        {
+            availableValues.Remove(correctAnswers[0]);
+            correctPositions[0] = -1;
+        }
 
         position = rnd.Range(0, availableValues.Count);
         correctAnswers[1] = availableValues[position];
@@ -79,7 +94,12 @@ public static class SETGenerator
     {
         string value3 = "";
 
-        for (int i = 0; i < 4; i++)
+        if (value1.Length != value2.Length)
+        {
+            throw new System.InvalidOperationException("Cannot find a set for values of different numbers of parameters. Values are " + value1 + " " + value2);
+        }
+
+        for (int i = 0; i < value1.Length; i++)
         {
             if (value1[i] == value2[i]) value3 += value1[i];
             else value3 += "012".Replace(value1[i].ToString(), string.Empty).Replace(value2[i].ToString(), string.Empty);

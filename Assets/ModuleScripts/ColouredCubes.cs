@@ -9,7 +9,7 @@ using Rnd = UnityEngine.Random;
 
 public class ColouredCubes : MonoBehaviour
 {
-
+    public Transform ButtonGrid;
     public KMBombInfo Bomb;
     public KMAudio Audio;
     public KMSelectable ScreenButton;
@@ -89,7 +89,7 @@ public class ColouredCubes : MonoBehaviour
         _screen.EnableOverride("Start");
 
         PermsManager.GenerateRandomPermutationSequence();
-        GenerateStageLightColours();
+        GenerateStageLightColoursAndStageThree();
 
         _stageOneSETValues = SETGenerator.GenerateSetList();
         _stageOneCorrectValues = SETGenerator.CorrectAnswers.ToArray();
@@ -102,12 +102,14 @@ public class ColouredCubes : MonoBehaviour
 
     }
 
-    void GenerateStageLightColours()
+    void GenerateStageLightColoursAndStageThree()
     {
         int[] colourValues;
         int redPosition = Rnd.Range(0, 3);
         int greenPosition = Rnd.Range(0, 3);
         int bluePosition = Rnd.Range(0, 3);
+        string stageOneValues = redPosition.ToString() + greenPosition.ToString() + bluePosition.ToString() + (Bomb.GetPortCount() % 3).ToString();
+        string stageTwoValues;
 
         for (int i = 0; i < 3; i++)
         {
@@ -124,6 +126,8 @@ public class ColouredCubes : MonoBehaviour
         greenPosition = Rnd.Range(0, 3);
         bluePosition = Rnd.Range(0, 3);
 
+        stageTwoValues = redPosition.ToString() + greenPosition.ToString() + bluePosition.ToString() + (Bomb.GetIndicators().Count() % 3).ToString();
+
         for (int i = 0; i < 3; i++)
         {
             colourValues = new int[] { 1, 1, 1 };
@@ -134,6 +138,9 @@ public class ColouredCubes : MonoBehaviour
             _stageTwoLightColours[i] = new Color(colourValues[0], colourValues[1], colourValues[2]);
             _stageTwoLightColourNames[i] = BinaryColourToName[colourValues[0].ToString() + colourValues[1].ToString() + colourValues[2].ToString()];
         }
+
+        _stageThreeSETValues = SETGenerator.GenerateSetList(stageOneValues, stageTwoValues);
+        _stageThreeCorrectValues= SETGenerator.CorrectAnswers.ToArray() ;
     }
 
     void SetStageLightColours(int stageNumber)
@@ -179,7 +186,9 @@ public class ColouredCubes : MonoBehaviour
         if (_numOfSelectedCubes == 3)
         {
             if (_stageNumber == 1) HandleStageOne();
+            else if (_stageNumber == 2) HandleStageTwo();
         }
+        else if (_numOfSelectedCubes == 2 && _stageNumber == 3) HandleStageThree();
     }
 
     void HandleSelection(CubeScript cube)
@@ -208,12 +217,42 @@ public class ColouredCubes : MonoBehaviour
         }
     }
 
+    void HandleStageTwo()
+    {
+        if (SubmissionCorrect(_stageTwoCorrectValues))
+        {
+            _stageNumber = 3;
+            StartCoroutine(StageThreeAnimation());
+        }
+        else
+        {
+            Strike();
+        }
+    }
+
+    void HandleStageThree()
+    {
+
+
+        if (SubmissionCorrect(_stageThreeCorrectValues))
+        {
+            DeselectAllCubes();
+            Module.HandlePass();
+            ModuleSolved = true;
+        }
+        else
+        {
+            Strike();
+        }
+    }
+
     bool SubmissionCorrect(string[] correctValues)
     {
         foreach (CubeScript cube in Cubes)
         {
             if (cube.IsSelected && !Array.Exists(correctValues, element => element == cube.SETValue))
             {
+                Debug.Log("That cube had SET value of " + cube.SETValue);
                 return false;
             }
         }
@@ -223,6 +262,8 @@ public class ColouredCubes : MonoBehaviour
 
     void ScreenPress()
     {
+        if (ModuleSolved) { StartCoroutine(FunnyButtonGridRotation()); return; }
+
         if (!_allowScreenSelection) return;
 
         if (_stageNumber == 0)
@@ -304,6 +345,10 @@ public class ColouredCubes : MonoBehaviour
             }
 
             SetStageLightColours(2);
+        }
+        else if (_displayedStage == 3)
+        {
+            StartCoroutine(StageThreeAnimation());
         }
 
         do { yield return null; } while (CubesBusy());
@@ -411,6 +456,62 @@ public class ColouredCubes : MonoBehaviour
         _screen.DisableOverride();
 
         if (_stageNumber == 2) _allowButtonSelection = true;
+    }
+
+    IEnumerator StageThreeAnimation()
+    {
+        DeselectAllCubes();
+
+        SetStageLightColours(3);
+
+        _allowButtonSelection = false;
+        _allowScreenSelection = false;
+
+        _screen.EnableOverride("...");
+        _screen.SetText("Stage 3");
+
+        StartCoroutine(FunnyButtonGridRotation());
+
+        Debug.Log(_stageThreeCorrectValues[0] + " " + _stageThreeCorrectValues[1] + " " + _stageThreeCorrectValues[2]);
+        Debug.Log(_stageThreeSETValues[0] + " " + _stageThreeSETValues[1] + " " + _stageThreeSETValues[2] + " " + _stageThreeSETValues[3] + " " + _stageThreeSETValues[4] + " " + _stageThreeSETValues[5] + " " + _stageThreeSETValues[6] + " " + _stageThreeSETValues[7] + " " + _stageThreeSETValues[8]);
+
+        for (int i = 0; i < 9; i++)
+        {
+            Cubes[i].SetStateFromSETValues(_stageThreeSETValues[i]);
+            Cubes[i].SetSelectionHiding(false);
+            if (_stageThreeCorrectValues.Contains(Cubes[i].SETValue)) Debug.Log("Correct cube at position " + GetPositionNumberFromCube(Cubes[i]).ToString());
+        }
+
+        do { yield return null; } while (CubesBusy());
+
+        SetStageLightColours(3);
+
+        _displayedStage = 3;
+        _screen.DisableOverride();
+        _allowScreenSelection = true;
+        _allowButtonSelection = true;
+    }
+
+    IEnumerator FunnyButtonGridRotation()
+    {
+        float transitionTime = 1;
+        float elapsedTime = 0;
+        float transitionScale;
+
+        yield return null;
+
+        while (elapsedTime <= transitionTime)
+        {
+            elapsedTime += Time.deltaTime;
+            ButtonGrid.Rotate(new Vector3(0, Time.deltaTime * 360 / transitionTime));
+
+            transitionScale = 1 + Mathf.Sin(Mathf.PI * elapsedTime / transitionTime) / 2;
+            ButtonGrid.localScale = new Vector3(transitionScale, transitionScale, transitionScale);
+
+            yield return null;
+        }
+
+        ButtonGrid.localRotation = new Quaternion(0, 0, 0, 0);
     }
 
     // These two methods look a bit confusing because we are taking position in *reading order* so we have to invert z.
