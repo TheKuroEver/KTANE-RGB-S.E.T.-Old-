@@ -83,7 +83,8 @@ public class CubeScript : MonoBehaviour
 		{"222", "White" }
 	};
 
-	void Start() {
+	void Start()
+	{
 		_cubeMeshRenderer = GetComponentInParent<MeshRenderer>();
 		_cubeTransform = GetComponentInParent<Transform>();
 		_position = GetPositionFromName();
@@ -91,13 +92,13 @@ public class CubeScript : MonoBehaviour
 	}
 
 	public void SetStateFromSETValues(string SETValues)
-    {
+	{
 		_SETValue = SETValues;
 		ModifySETValuesBasedOnPosition();
 
 		ChangeColour(_displayedSETValue[0] - '0', _displayedSETValue[1] - '0', _displayedSETValue[2] - '0');
 		ChangeSize(_displayedSETValue[3] - '0');
-    }
+	}
 
 	private void ModifySETValuesBasedOnPosition()
 	{
@@ -139,22 +140,22 @@ public class CubeScript : MonoBehaviour
 	}
 
 	public void SetHiddenStatus(bool value, float transitionTime = 1)
-    {
+	{
 		if (value == _isHidden) return;
 
 		_isMoving = true;
 		_isHidden = value;
 		StartCoroutine(MoveToHidden(value, transitionTime));
-    }
+	}
 
 	public void ChangePosition(int[] newPosition)
-    {
+	{
 		if (_isMoving) return;
 		if (_position[0] == newPosition[0] && _position[1] == newPosition[1]) return;
 
 		_isMoving = true;
 		StartCoroutine(SetPositionTo(newPosition));
-    }
+	}
 
 	private IEnumerator SetSizeTo(int newSize)
 	{
@@ -215,8 +216,8 @@ public class CubeScript : MonoBehaviour
 		_isChangingColour = false;
 	}
 
-	private IEnumerator	MoveToHidden(bool value, float transitionTime)
-    {
+	private IEnumerator MoveToHidden(bool value, float transitionTime)
+	{
 		Vector3 startPosition = _cubeTransform.localPosition;
 		float elapsedTime = 0;
 		float transitionProgress;
@@ -239,7 +240,7 @@ public class CubeScript : MonoBehaviour
 	}
 
 	private IEnumerator SetPositionTo(int[] newPosition)
-    {
+	{
 		float transitionTime = 1;
 		float elapsedTime = 0;
 		float transitionProgress;
@@ -254,7 +255,7 @@ public class CubeScript : MonoBehaviour
 			elapsedTime += Time.deltaTime;
 			transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
 			currentTransitionPosition = new Vector3(0.04f * (_position[0] + transitionProgress * xDifference), _cubeTransform.localPosition.y, -0.04f * (_position[1] + transitionProgress * zDifference));
-			
+
 			_cubeTransform.localPosition = currentTransitionPosition;
 			yield return null;
 		}
@@ -264,29 +265,29 @@ public class CubeScript : MonoBehaviour
 	}
 
 	public void SetSelectionHiding(bool value)
-    {
+	{
 		_hideSelection = value;
 		SelectionHighlight.SetActive(!_hideSelection && _isSelected);
 	}
 
 	public void EnableSelectionHighlight(bool value)
-    {
+	{
 		_isSelected = value;
 		SelectionHighlight.SetActive(value);
 		EnableHighlightOverride(true);
-    }
+	}
 
 	public void EnableHighlightOverride(bool value)
-    {
+	{
 		if (value) SelectionHighlight.SetActive(false);
 		else SelectionHighlight.SetActive(!_hideSelection && _isSelected);
-    }
+	}
 
 	public void FlashRed()
-    {
+	{
 		int[] cubeColour = _colourAsTernaryValues;
 		_cubeMeshRenderer.material.color = Color.red;
 		_colourAsTernaryValues = new int[] { 2, 0, 0 };
 		ChangeColour(cubeColour[0], cubeColour[1], cubeColour[2]);
-    }
+	}
 }

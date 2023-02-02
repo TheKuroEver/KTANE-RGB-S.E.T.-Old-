@@ -73,7 +73,7 @@ public class ColouredCubes : MonoBehaviour
         {
             tempSelectable = cube.GetComponentInParent<KMSelectable>();
             tempSelectable.OnInteract += delegate () { ButtonPress(cube); return false; };
-            tempSelectable.OnHighlight += delegate () { cube.EnableHighlightOverride(true);  _screen.DisplayColourName(cube.ColourAsName); };
+            tempSelectable.OnHighlight += delegate () { cube.EnableHighlightOverride(true); _screen.DisplayColourName(cube.ColourAsName); };
             tempSelectable.OnHighlightEnded += delegate () { cube.EnableHighlightOverride(false); _screen.EndColourNameDisplay(); };
         }
 
@@ -371,7 +371,7 @@ public class ColouredCubes : MonoBehaviour
 
         foreach (Cycle cycle in PermsManager.Cycles)
         {
-            foreach (CubeScript cube in Cubes) 
+            foreach (CubeScript cube in Cubes)
             {
                 position = GetPositionNumberFromCube(cube);
                 if (!cycle.Contains(position)) cube.SetHiddenStatus(true);
@@ -421,13 +421,17 @@ public class ColouredCubes : MonoBehaviour
 
     int[] GetPositionFromNumber(int number)
     {
+<<<<<<< HEAD
         return new int[] { (number % 3) - 1, (number / 3) - 1};
+=======
+        return new int[] { (number % 3) - 1, (number / 3) - 1 };
+>>>>>>> a9584f9d51c826892f8acd488e72114d2fb54012
     }
 
     void DeselectAllCubes()
     {
         _numOfSelectedCubes = 0;
-        
+
         foreach (CubeScript cube in Cubes)
         {
             cube.EnableSelectionHighlight(false);
@@ -477,9 +481,9 @@ public class ColouredCubes : MonoBehaviour
         DeselectAllCubes();
     }
 
-    #pragma warning disable 414
+#pragma warning disable 414
     private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
-    #pragma warning restore 414
+#pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string Command)
     {
