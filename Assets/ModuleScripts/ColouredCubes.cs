@@ -13,6 +13,8 @@ public class ColouredCubes : MonoBehaviour
     public KMBombInfo Bomb;
     public KMAudio Audio;
     public KMSelectable ScreenButton;
+    public KMSelectable[] StageLights;
+    public KMBombModule Module;
     public CubeScript[] Cubes;
     public TextMesh ScreenText;
 
@@ -22,35 +24,56 @@ public class ColouredCubes : MonoBehaviour
 
     private ScreenTextHandler _screen;
     private int _stageNumber = 0;
+    private int _displayedStage;
     private int _numOfSelectedCubes = 0;
+
+    private int[] _stageOneLightColourValues;
+    private int[] _stageTwoLightColourValues;
+
+    private string[] _StageOneLightColours;
+    private string[] _StageTwoLightColours;
+
     private string[] _stageOneSETValues;
     private string[] _stageTwoSETValues;
     private string[] _stageThreeSETValues;
     private string[] _stageOneCorrectValues;
     private string[] _stageTwoCorrectValues;
     private string[] _stageThreeCorrectValues;
+
     private bool _allowButtonSelection = false;
     private bool _allowScreenSelection = true;
     private bool _displayingSizeChart = false;
 
     void Awake()
     {
+        ModuleId = ModuleIdCounter++;
+
         _screen = new ScreenTextHandler(ScreenText);
         KMSelectable tempSelectable;
-
-        ModuleId = ModuleIdCounter++;
 
         foreach (CubeScript cube in Cubes)
         {
             tempSelectable = cube.GetComponentInParent<KMSelectable>();
             tempSelectable.OnInteract += delegate () { ButtonPress(cube); return false; };
-            tempSelectable.OnHighlight += delegate () { cube.EnableHighlightOverride(true);  _screen.DisplayColourName(cube.ColourAsName); };
+            tempSelectable.OnHighlight += delegate () { cube.EnableHighlightOverride(true); _screen.DisplayColourName(cube.ColourAsName); };
             tempSelectable.OnHighlightEnded += delegate () { cube.EnableHighlightOverride(false); _screen.EndColourNameDisplay(); };
         }
 
         ScreenButton.OnInteract += delegate () { ScreenPress(); return false; };
 
+        foreach (KMSelectable stageLight in StageLights)
+        {
+            stageLight.OnInteract += delegate () { StageLightPress(stageLight); return false; };
+        }
+
         _screen.EnableOverride("Start");
+
+        PermsManager.GenerateRandomPermutationSequence();
+
+        _stageOneSETValues = SETGenerator.GenerateSetList();
+        _stageOneCorrectValues = SETGenerator.CorrectAnswers;
+        _stageTwoSETValues = SETGenerator.GenerateSetList();
+        _stageTwoCorrectValues = SETGenerator.CorrectAnswers;
     }
 
     void Start()
@@ -89,14 +112,13 @@ public class ColouredCubes : MonoBehaviour
     {
         if (SubmissionCorrect())
         {
-            _screen.EnableOverride("CORRECT!");
+            _stageNumber++;
+            StartCoroutine(StageTwoAnimation());
         }
         else
         {
-            _screen.EnableOverride("INCORRECT!");
+            StartCoroutine(StageTwoAnimation());
         }
-
-        StartCoroutine(StageTwoAnimation());
     }
 
     bool SubmissionCorrect()
@@ -121,8 +143,6 @@ public class ColouredCubes : MonoBehaviour
             ReorderCubes();
             _stageNumber++;
 
-            _stageOneSETValues = SETGenerator.GenerateSetList();
-            _stageOneCorrectValues = SETGenerator.CorrectAnswers;
             StartCoroutine(StageOneAnimation());
         }
         else if (!_displayingSizeChart)
@@ -132,6 +152,20 @@ public class ColouredCubes : MonoBehaviour
         else if (_displayingSizeChart)
         {
             StartCoroutine(HideSizeChart());
+        }
+    }
+
+    void StageLightPress(KMSelectable pressedLight)
+    {
+        if (!_allowScreenSelection || !_allowButtonSelection) return;
+
+        if (pressedLight.name == "Stage1Light" && _displayedStage != 1)
+        {
+            StartCoroutine(StageOneAnimation());
+        }
+        else if (pressedLight.name == "Stage2Light" && _displayedStage != 2)
+        {
+            StartCoroutine(StageTwoAnimation());
         }
     }
 
@@ -178,6 +212,9 @@ public class ColouredCubes : MonoBehaviour
 
     IEnumerator StageOneAnimation()
     {
+        _allowButtonSelection = false;
+        _allowScreenSelection = false;
+
         _screen.EnableOverride("...");
         _screen.SetText("Stage 1");
 
@@ -196,8 +233,10 @@ public class ColouredCubes : MonoBehaviour
 
         do { yield return null; } while (CubesBusy());
 
+        _displayedStage = 1;
         _screen.DisableOverride();
         _allowButtonSelection = true;
+        _allowScreenSelection = true;
     }
 
     IEnumerator StageTwoAnimation()
@@ -212,17 +251,15 @@ public class ColouredCubes : MonoBehaviour
 
         foreach (CubeScript cube in Cubes)
         {
-            cube.ChangeColour(1, 1, 1);
+            cube.ChangeColour(2, 2, 2);
             cube.ChangeSize(0);
         }
 
         do { yield return null; } while (CubesBusy());
 
-        PermsManager.GenerateRandomPermutationSequence();
-
         foreach (Cycle cycle in PermsManager.Cycles)
         {
-            foreach (CubeScript cube in Cubes) 
+            foreach (CubeScript cube in Cubes)
             {
                 position = GetPositionNumberFromCube(cube);
                 if (!cycle.Contains(position)) cube.SetHiddenStatus(true);
@@ -245,9 +282,6 @@ public class ColouredCubes : MonoBehaviour
             cube.SetHiddenStatus(false);
         }
 
-        _stageTwoSETValues = SETGenerator.GenerateSetList();
-        _stageTwoCorrectValues = SETGenerator.CorrectAnswers;
-
         for (int i = 0; i < 9; i++)
         {
             Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
@@ -255,6 +289,7 @@ public class ColouredCubes : MonoBehaviour
 
         do { yield return null; } while (CubesBusy());
 
+        _displayedStage = 2;
         ReorderCubes();
         _screen.DisableOverride();
         _allowButtonSelection = true;
@@ -268,21 +303,22 @@ public class ColouredCubes : MonoBehaviour
 
     int[] GetPositionFromNumber(int number)
     {
-        return new int[] { (number % 3) - 1, 1 - (number / 3)};
+        return new int[] { (number % 3) - 1, 1 - (number / 3) };
     }
 
     void DeselectAllCubes()
     {
         _numOfSelectedCubes = 0;
-        
+
         foreach (CubeScript cube in Cubes)
         {
             cube.EnableSelectionHighlight(false);
         }
     }
 
-    void ReorderCubes() // This is for gamepad support.
+    void ReorderCubes() // This is mainly for gamepad support.
     {
+        var newCubeOrder = new CubeScript[9];
         int row;
         int col;
         int pos;
@@ -294,8 +330,11 @@ public class ColouredCubes : MonoBehaviour
             pos = 5 + col + 4 * (1 + row);
 
             GetComponentInParent<KMSelectable>().Children[pos] = cube.GetComponentInParent<KMSelectable>();
+
+            newCubeOrder[4 + row + 3 * col] = cube;
         }
 
+        Cubes = newCubeOrder;
         GetComponentInParent<KMSelectable>().UpdateChildren();
     }
 
@@ -312,9 +351,16 @@ public class ColouredCubes : MonoBehaviour
         return false;
     }
 
-    #pragma warning disable 414
+    void Strike()
+    {
+        foreach (CubeScript cube in Cubes) cube.FlashRed();
+
+        Module.HandleStrike();
+    }
+
+#pragma warning disable 414
     private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
-    #pragma warning restore 414
+#pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string Command)
     {
