@@ -90,7 +90,7 @@ public static class SETGenerator
         return correctPositions;
     }
 
-    private static string FindMatchingSet(string value1, string value2)
+    public static string FindMatchingSet(string value1, string value2)
     {
         string value3 = "";
 

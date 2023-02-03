@@ -27,6 +27,31 @@ public class ColouredCubes : MonoBehaviour
     private int _displayedStage;
     private int _numOfSelectedCubes = 0;
 
+    private int[][] _originalPositions = new int[][]
+    {
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2]
+    };
+    private int[][] _stageThreePositions = new int[][]
+    {
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2],
+        new int[2]
+    };
+
     private Color[] _stageOneLightColours = new Color[3];
     private Color[] _stageTwoLightColours = new Color[3];
 
@@ -42,6 +67,7 @@ public class ColouredCubes : MonoBehaviour
     private bool _allowButtonSelection = false;
     private bool _allowScreenSelection = true;
     private bool _displayingSizeChart = false;
+    private bool _generatedStageTwo = false;
 
     private readonly Dictionary<string, string> BinaryColourToName = new Dictionary<string, string>()
     {
@@ -269,6 +295,8 @@ public class ColouredCubes : MonoBehaviour
             ReorderCubes();
             _stageNumber = 1;
 
+            foreach (CubeScript cube in Cubes) cube.Reappear();
+
             StartCoroutine(StageOneAnimation(true));
         }
         else if (!_displayingSizeChart)
@@ -342,7 +370,7 @@ public class ColouredCubes : MonoBehaviour
 
             for (int i = 0; i < 9; i++)
             {
-                Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
+                Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i], _originalPositions[GetPositionNumberFromCube(Cubes[i])]);
                 Cubes[i].SetSelectionHiding(false);
             }
 
@@ -448,9 +476,11 @@ public class ColouredCubes : MonoBehaviour
         Debug.Log(_stageTwoCorrectValues[0] + " " + _stageTwoCorrectValues[1] + " " + _stageTwoCorrectValues[2]);
         Debug.Log(_stageTwoSETValues[0] + " " + _stageTwoSETValues[1] + " " + _stageTwoSETValues[2] + " " + _stageTwoSETValues[3] + " " + _stageTwoSETValues[4] + " " + _stageTwoSETValues[5] + " " + _stageTwoSETValues[6] + " " + _stageTwoSETValues[7] + " " + _stageTwoSETValues[8]);
 
+        if (!_generatedStageTwo) GenerateStageTwoAndThreePositions();
+
         for (int i = 0; i < 9; i++)
         {
-            Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
+            Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i], _originalPositions[GetPositionNumberFromCube(Cubes[i])]);
             if (_stageTwoCorrectValues.Contains(Cubes[i].SETValue)) Debug.Log("Correct cube at position " + GetPositionNumberFromCube(Cubes[i]).ToString());
         }
 
@@ -484,7 +514,7 @@ public class ColouredCubes : MonoBehaviour
 
         for (int i = 0; i < 9; i++)
         {
-            Cubes[i].SetStateFromSETValues(_stageThreeSETValues[i]);
+            Cubes[i].SetStateFromSETValues(_stageThreeSETValues[i], _stageThreePositions[GetPositionNumberFromCube(Cubes[i])]);
             Cubes[i].SetSelectionHiding(false);
             if (_stageThreeCorrectValues.Contains(Cubes[i].SETValue)) Debug.Log("Correct cube at position " + GetPositionNumberFromCube(Cubes[i]).ToString());
         }
@@ -519,6 +549,22 @@ public class ColouredCubes : MonoBehaviour
         }
 
         ButtonGrid.localRotation = new Quaternion(0, 0, 0, 0);
+    }
+
+    void GenerateStageTwoAndThreePositions()
+    {
+        string newPositionString;
+
+        foreach (CubeScript cube in Cubes)
+        {
+            _originalPositions[GetPositionNumberFromCube(cube)] = cube.OriginalPosition;
+
+            newPositionString = SETGenerator.FindMatchingSet((cube.OriginalPosition[0] + 1).ToString() + (cube.OriginalPosition[1] + 1).ToString(), (cube.Position[0] + 1).ToString() + (cube.Position[1] + 1).ToString());
+            Debug.Log((cube.OriginalPosition[0] + 1).ToString() + (cube.OriginalPosition[1] + 1).ToString() + " and " + (cube.Position[0] + 1).ToString() + (cube.Position[1] + 1).ToString() + " became " + newPositionString);
+            _stageThreePositions[GetPositionNumberFromCube(cube)] = new int[] { newPositionString[0] - '1', newPositionString[1] - '1' };
+        }
+
+        _generatedStageTwo = true;
     }
 
     // These two methods look a bit confusing because we are taking position in *reading order* so we have to invert z.

@@ -13,6 +13,7 @@ public class CubeScript : MonoBehaviour
 	private MeshRenderer _cubeMeshRenderer;
 	private Transform _cubeTransform;
 
+	private int[] _originalPosition;
 	private int[] _position;
 	private int _size = 2;
 
@@ -51,6 +52,7 @@ public class CubeScript : MonoBehaviour
 	public bool IsBusy { get { return _isChangingSize || IsChangingColour || _isMoving; } }
 	public bool IsSelected { get { return _isSelected; } }
 	public int[] Position { get { return _position; } }
+	public int[] OriginalPosition { get { return _originalPosition; } }
 
 	private readonly Dictionary<string, string> TernaryToColourName = new Dictionary<string, string>()
 	{
@@ -88,24 +90,35 @@ public class CubeScript : MonoBehaviour
 		_cubeMeshRenderer = GetComponentInParent<MeshRenderer>();
 		_cubeTransform = GetComponentInParent<Transform>();
 		_position = GetPositionFromName();
+		_originalPosition = _position;
 		_cubeTransform.localPosition = new Vector3(_cubeTransform.localPosition.x, -0.04f, _cubeTransform.localPosition.z);
+		Disappear();
 	}
 
 	public void SetStateFromSETValues(string SETValues)
 	{
 		_SETValue = SETValues;
-		ModifySETValuesBasedOnPosition();
+		ModifySETValuesBasedOnPosition(_position);
 
 		ChangeColour(_displayedSETValue[0] - '0', _displayedSETValue[1] - '0', _displayedSETValue[2] - '0');
 		ChangeSize(_displayedSETValue[3] - '0');
 	}
 
-	private void ModifySETValuesBasedOnPosition()
+	public void SetStateFromSETValues(string SETValues, int[] modifierPositions)
 	{
-		string rValue = (_position[1] == -1) ? ((_SETValue[0] + '1') % 3).ToString() : _SETValue[0].ToString();
-		string gValue = (_position[1] == 0) ? ((_SETValue[1] + '1') % 3).ToString() : _SETValue[1].ToString();
-		string bValue = (_position[1] == 1) ? ((_SETValue[2] + '1') % 3).ToString() : _SETValue[2].ToString();
-		string size = ((_SETValue[3] + Position[0] + 1) % 3).ToString();
+		_SETValue = SETValues;
+		ModifySETValuesBasedOnPosition(modifierPositions);
+
+		ChangeColour(_displayedSETValue[0] - '0', _displayedSETValue[1] - '0', _displayedSETValue[2] - '0');
+		ChangeSize(_displayedSETValue[3] - '0');
+	}
+
+	private void ModifySETValuesBasedOnPosition(int[] positionToUse)
+	{
+		string rValue = (positionToUse[1] == -1) ? ((_SETValue[0] + '1') % 3).ToString() : _SETValue[0].ToString();
+		string gValue = (positionToUse[1] == 0) ? ((_SETValue[1] + '1') % 3).ToString() : _SETValue[1].ToString();
+		string bValue = (positionToUse[1] == 1) ? ((_SETValue[2] + '1') % 3).ToString() : _SETValue[2].ToString();
+		string size = ((_SETValue[3] + positionToUse[0] + 1) % 3).ToString();
 
 		_displayedSETValue = rValue + gValue + bValue + size;
 	}
@@ -263,6 +276,16 @@ public class CubeScript : MonoBehaviour
 		_isMoving = false;
 		_position = new int[] { newPosition[0], newPosition[1] };
 	}
+
+	private void Disappear()
+    {
+		_cubeTransform.localScale = new Vector3(0, 0, 0);
+    }
+
+	public void Reappear()
+    {
+		_cubeTransform.localScale = new Vector3(_biggestCubeSize, _biggestCubeSize, _biggestCubeSize);
+    }
 
 	public void SetSelectionHiding(bool value)
 	{
