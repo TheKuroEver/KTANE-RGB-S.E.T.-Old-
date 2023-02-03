@@ -222,7 +222,7 @@ public class ColouredCubes : MonoBehaviour
         if (SubmissionCorrect(_stageTwoCorrectValues))
         {
             _stageNumber = 3;
-            StartCoroutine(StageThreeAnimation());
+            StartCoroutine(StageThreeAnimation(true));
         }
         else
         {
@@ -232,8 +232,6 @@ public class ColouredCubes : MonoBehaviour
 
     void HandleStageThree()
     {
-
-
         if (SubmissionCorrect(_stageThreeCorrectValues))
         {
             DeselectAllCubes();
@@ -295,6 +293,10 @@ public class ColouredCubes : MonoBehaviour
         {
             StartCoroutine(StageTwoAnimation(true));
         }
+        else if (pressedLight.name == "Stage3Light" && _displayedStage != 3 && _stageNumber >= 3)
+        {
+            StartCoroutine(StageThreeAnimation(true));
+        }
     }
 
     // This is my first experience with coroutines (also only my second mod) so the code is bad. Sorry. Not as bad as The Cipher Ever though.
@@ -348,7 +350,7 @@ public class ColouredCubes : MonoBehaviour
         }
         else if (_displayedStage == 3)
         {
-            StartCoroutine(StageThreeAnimation());
+            StartCoroutine(StageThreeAnimation(false));
         }
 
         do { yield return null; } while (CubesBusy());
@@ -403,6 +405,7 @@ public class ColouredCubes : MonoBehaviour
         SetStageLightColours(3);
 
         _allowButtonSelection = false;
+        _allowScreenSelection = false;
         _screen.EnableOverride("...");
         _screen.SetText("Stage 2");
 
@@ -442,6 +445,9 @@ public class ColouredCubes : MonoBehaviour
             cube.SetSelectionHiding(false);
         }
 
+        Debug.Log(_stageTwoCorrectValues[0] + " " + _stageTwoCorrectValues[1] + " " + _stageTwoCorrectValues[2]);
+        Debug.Log(_stageTwoSETValues[0] + " " + _stageTwoSETValues[1] + " " + _stageTwoSETValues[2] + " " + _stageTwoSETValues[3] + " " + _stageTwoSETValues[4] + " " + _stageTwoSETValues[5] + " " + _stageTwoSETValues[6] + " " + _stageTwoSETValues[7] + " " + _stageTwoSETValues[8]);
+
         for (int i = 0; i < 9; i++)
         {
             Cubes[i].SetStateFromSETValues(_stageTwoSETValues[i]);
@@ -454,13 +460,14 @@ public class ColouredCubes : MonoBehaviour
 
         _displayedStage = 2;
         _screen.DisableOverride();
+        _allowScreenSelection = true;
 
         if (_stageNumber == 2) _allowButtonSelection = true;
     }
 
-    IEnumerator StageThreeAnimation()
+    IEnumerator StageThreeAnimation(bool deselect)
     {
-        DeselectAllCubes();
+        if (deselect) DeselectAllCubes();
 
         SetStageLightColours(3);
 
@@ -491,7 +498,7 @@ public class ColouredCubes : MonoBehaviour
         _allowScreenSelection = true;
         _allowButtonSelection = true;
     }
-
+        
     IEnumerator FunnyButtonGridRotation()
     {
         float transitionTime = 1;
@@ -503,7 +510,7 @@ public class ColouredCubes : MonoBehaviour
         while (elapsedTime <= transitionTime)
         {
             elapsedTime += Time.deltaTime;
-            ButtonGrid.Rotate(new Vector3(0, Time.deltaTime * 360 / transitionTime));
+            ButtonGrid.Rotate(new Vector3(Time.deltaTime * 360 / transitionTime, 0));
 
             transitionScale = 1 + Mathf.Sin(Mathf.PI * elapsedTime / transitionTime) / 2;
             ButtonGrid.localScale = new Vector3(transitionScale, transitionScale, transitionScale);
@@ -546,7 +553,7 @@ public class ColouredCubes : MonoBehaviour
         {
             col = cube.Position[0];
             row = cube.Position[1];
-            pos = 5 + col + 4 * (1 - row);
+            pos = 5 + col + 4 * (row + 1);
 
             GetComponentInParent<KMSelectable>().Children[pos] = cube.GetComponentInParent<KMSelectable>();
 
@@ -576,20 +583,6 @@ public class ColouredCubes : MonoBehaviour
         Module.HandleStrike();
 
         DeselectAllCubes();
-    }
-
-#pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
-#pragma warning restore 414
-
-    IEnumerator ProcessTwitchCommand(string Command)
-    {
-        yield return null;
-    }
-
-    IEnumerator TwitchHandleForcedSolve()
-    {
-        yield return null;
     }
 
     private class ScreenTextHandler
@@ -644,4 +637,20 @@ public class ColouredCubes : MonoBehaviour
             _isOverride = false;
         }
     }
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string Command)
+    {
+        yield return null;
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        yield return null;
+    }
+
+
 }
