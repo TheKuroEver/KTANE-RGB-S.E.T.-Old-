@@ -113,7 +113,10 @@ public class ColouredCubes : MonoBehaviour
         }
 
         _screen.EnableOverride("Start");
+    }
 
+    void Start()
+    {
         PermsManager.GenerateRandomPermutationSequence();
         GenerateStageLightColoursAndStageThree();
 
@@ -121,11 +124,8 @@ public class ColouredCubes : MonoBehaviour
         _stageOneCorrectValues = SETGenerator.CorrectAnswers.ToArray();
         _stageTwoSETValues = SETGenerator.GenerateSetList();
         _stageTwoCorrectValues = SETGenerator.CorrectAnswers.ToArray();
-    }
 
-    void Start()
-    {
-
+        Debug.LogFormat("[Coloured Cubes #{0}] Funny logging 123 {1}", ModuleId, _stageOneCorrectValues[1]);
     }
 
     void GenerateStageLightColoursAndStageThree()
@@ -134,6 +134,7 @@ public class ColouredCubes : MonoBehaviour
         int redPosition = Rnd.Range(0, 3);
         int greenPosition = Rnd.Range(0, 3);
         int bluePosition = Rnd.Range(0, 3);
+        Debug.Log("Using " + (Bomb.GetPortCount() % 3).ToString() + " ports (mod 3) and " + (Bomb.GetIndicators().Count() % 3).ToString() + " indicators (mod 3).");
         string stageOneValues = redPosition.ToString() + greenPosition.ToString() + bluePosition.ToString() + (Bomb.GetPortCount() % 3).ToString();
         string stageTwoValues;
 
@@ -276,8 +277,7 @@ public class ColouredCubes : MonoBehaviour
         {
             if (cube.IsSelected && !Array.Exists(correctValues, element => element == cube.SETValue))
             {
-                Debug.Log("That cube had SET value of " + cube.SETValue);
-                return false;
+                return SETGenerator.FormASet(Cubes.Where(c => c.IsSelected).Select(c => c.SETValue).ToArray());
             }
         }
 

@@ -115,4 +115,16 @@ public static class SETGenerator
             availableValues.Remove(FindMatchingSet(newValue, existingValue));
         }
     }
+
+    public static bool FormASet(string[] values)
+    {
+        if (values.Length != 3) return false;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if ((values[i][0] + values[i][1] + values[i][2]) % 3 != 0) return false;
+        }
+
+        return true;
+    }
 }
