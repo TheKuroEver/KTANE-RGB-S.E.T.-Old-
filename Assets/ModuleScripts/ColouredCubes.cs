@@ -26,6 +26,7 @@ public class ColouredCubes : MonoBehaviour
     private int _stageNumber = 0;
     private int _displayedStage;
     private int _numOfSelectedCubes = 0;
+    private int _nextStageForLogging = 1;
 
     private int[][] _originalPositions = new int[][]
     {
@@ -88,6 +89,32 @@ public class ColouredCubes : MonoBehaviour
         { "Stage3Light", 2 },
     };
 
+    private readonly Dictionary<int, string> BottomToTopColumnOrderToPosition = new Dictionary<int, string>()
+    {
+        { 0, "Bottom left" },
+        { 1, "Middle left" },
+        { 2, "Top left" },
+        { 3, "Bottom middle" },
+        { 4, "Middle centre" },
+        { 5, "Top middle" },
+        { 6, "Bottom right" },
+        { 7, "Middle right" },
+        { 8, "Top right" }
+    };
+
+    public static readonly Dictionary<int, string> ReadingOrderToPosition = new Dictionary<int, string>()
+    {
+        { 0, "Top left" },
+        { 1, "Top middle" },
+        { 2, "Top right" },
+        { 3, "Middle left" },
+        { 4, "Middle centre" },
+        { 5, "Middle right" },
+        { 6, "Bottom left" },
+        { 7, "Bottom middle" },
+        { 8, "Bottom right" }
+    };
+
     void Awake()
     {
         ModuleId = ModuleIdCounter++;
@@ -118,14 +145,58 @@ public class ColouredCubes : MonoBehaviour
     void Start()
     {
         PermsManager.GenerateRandomPermutationSequence();
-        GenerateStageLightColoursAndStageThree();
 
         _stageOneSETValues = SETGenerator.GenerateSetList();
         _stageOneCorrectValues = SETGenerator.CorrectAnswers.ToArray();
         _stageTwoSETValues = SETGenerator.GenerateSetList();
         _stageTwoCorrectValues = SETGenerator.CorrectAnswers.ToArray();
 
-        Debug.LogFormat("[Coloured Cubes #{0}] Funny logging 123 {1}", ModuleId, _stageOneCorrectValues[1]);
+        GenerateStageLightColoursAndStageThree();
+    }
+
+    void LogStageOne()
+    {
+        string position;
+        int j;
+
+        Debug.LogFormat("[Coloured Cubes #{0}] Positions are from 0-8 in reading order.", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Values are in Red-Green-Blue-Size order.", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", ModuleId);
+
+        for (int i = 0; i < 9; i++)
+        {
+            j = (i - (i % 3)) + (3 - (i % 3)) - 1; // We do a little reordering.
+            position = BottomToTopColumnOrderToPosition[j];
+            Debug.LogFormat("[Coloured Cubes #{0}] {1} cube is {2}, size {3}. Its actual values are {4}.", ModuleId, position, Cubes[j].ColourAsName.ToLower(), Cubes[j].Size, Cubes[j].SETValue);
+        }
+
+        Debug.LogFormat("[Coloured Cubes #{0}] One possible set is {1}, {2}, and {3}.", ModuleId, _stageOneCorrectValues[0], _stageOneCorrectValues[1], _stageOneCorrectValues[2]);
+
+        _nextStageForLogging = 2;
+    }
+
+    void LogStageTwo()
+    {
+        string position;
+        int j;
+
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage 2:", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] The cycles used were as follows:", ModuleId);
+
+        foreach (Cycle cycle in PermsManager.Cycles)
+        {
+            Debug.LogFormat("[Coloured Cubes #{0}] {1}", ModuleId, cycle.ToString());
+        }
+
+        for (int i = 0; i < 9; i++)
+        {
+            j = (i - (i % 3)) + (3 - (i % 3)) - 1; // We do a little reordering.
+            position = BottomToTopColumnOrderToPosition[j];
+            Debug.LogFormat("[Coloured Cubes #{0}] {1} cube is {2}, size {3}. This cube's original position was {4}. Its actual values are {5}.", ModuleId, position, Cubes[j].ColourAsName.ToLower(), Cubes[j].Size, ReadingOrderToPosition[GetPositionNumber(_originalPositions[i])].ToLower(), Cubes[j].SETValue);
+        }
+
+        Debug.LogFormat("[Coloured Cubes #{0}] One possible set is {1}, {2}, and {3}.", ModuleId, _stageTwoCorrectValues[0], _stageTwoCorrectValues[1], _stageTwoCorrectValues[2]);
+        _nextStageForLogging = 3;
     }
 
     void GenerateStageLightColoursAndStageThree()
@@ -411,7 +482,6 @@ public class ColouredCubes : MonoBehaviour
         for (int i = 0; i < 9; i++)
         {
             Cubes[i].SetStateFromSETValues(_stageOneSETValues[i]);
-            if (_stageOneCorrectValues.Contains(Cubes[i].SETValue)) Debug.Log("Correct cube at position " + GetPositionNumberFromCube(Cubes[i]).ToString());
         }
 
         do { yield return null; } while (CubesBusy());
@@ -423,6 +493,8 @@ public class ColouredCubes : MonoBehaviour
         _allowScreenSelection = true;
 
         if (_stageNumber == 1) _allowButtonSelection = true;
+
+        if (_nextStageForLogging == 1) LogStageOne();
     }
 
     IEnumerator StageTwoAnimation(bool deselect)
@@ -493,6 +565,7 @@ public class ColouredCubes : MonoBehaviour
         _allowScreenSelection = true;
 
         if (_stageNumber == 2) _allowButtonSelection = true;
+        if (_nextStageForLogging == 2) LogStageTwo();
     }
 
     IEnumerator StageThreeAnimation(bool deselect)
@@ -571,6 +644,11 @@ public class ColouredCubes : MonoBehaviour
     int GetPositionNumberFromCube(CubeScript cube)
     {
         return (cube.Position[0] + 1) + ((cube.Position[1] + 1) * 3);
+    }
+
+    int GetPositionNumber(int[] position)
+    {
+        return (position[0] + 1) + ((position[1] + 1) * 3);
     }
 
     int[] GetPositionFromNumber(int number)

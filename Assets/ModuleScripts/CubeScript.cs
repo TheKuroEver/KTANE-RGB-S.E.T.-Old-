@@ -53,6 +53,7 @@ public class CubeScript : MonoBehaviour
 	public bool IsSelected { get { return _isSelected; } }
 	public int[] Position { get { return _position; } }
 	public int[] OriginalPosition { get { return _originalPosition; } }
+	public int Size { get { return _size; } }
 
 	private readonly Dictionary<string, string> TernaryToColourName = new Dictionary<string, string>()
 	{

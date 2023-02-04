@@ -111,4 +111,16 @@ public class Cycle
     {
         return _elements.Contains(position);
     }
+
+    public override string ToString()
+    {
+        string cycleAsString = "( ";
+
+        foreach (int element in _elements)
+        {
+            cycleAsString += ColouredCubes.ReadingOrderToPosition[element] + " -> ";
+        }
+
+        return cycleAsString + ColouredCubes.ReadingOrderToPosition[_elements[0]] + " )";
+    }
 }
